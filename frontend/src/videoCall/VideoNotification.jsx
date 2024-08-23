@@ -15,9 +15,12 @@ const VideoNotification = () => {
             try {
                 const data = await getVideoCallRequests(userId);
 
+                // Filter out requests where senderId is the same as userId (i.e., the user is calling themselves)
+                const filteredRequests = data.videoCallRequests.filter(request => request.senderId !== userId);
+
                 // Filter out duplicate requests from the same sender
-                const newRequests = data.videoCallRequests.filter((request, index, self) =>
-                    index === self.findIndex(r => r.receiverId === request.userId)
+                const newRequests = filteredRequests.filter((request, index, self) =>
+                    index === self.findIndex(r => r.senderId === request.senderId)
                 );
 
                 // Play ringtone only once when new requests arrive
@@ -25,7 +28,7 @@ const VideoNotification = () => {
                     ringtone.play();
                     setHasPlayedRingtone(true); // Set the flag to true after playing ringtone
                 }
-                
+
                 setRequests(newRequests);
 
                 // Set timeout to auto-reject calls after 1 minute
@@ -62,7 +65,7 @@ const VideoNotification = () => {
             setRequests(requests.filter(request => request._id !== id));
             stopRingtone();
         } catch (error) {
-            console.error('Failed to reject call');
+            console.error("Failed to reject call");
         }
     };
 
@@ -77,7 +80,7 @@ const VideoNotification = () => {
         <div className="fixed bottom-4 right-10 space-y-4 z-50">
             {requests.map(request => (
                 <div key={request._id} className="border p-4 rounded-md shadow-lg bg-white flex justify-between items-center flex-col">
-                    <p className="text-lg font-semibold ">{` ${request.senderName} is Calling`}</p>
+                    <p className="text-lg font-semibold ">{`${request.senderName} is Calling`}</p>
                     <FcVideoCall className='text-3xl my-4 animate-vibrate' />
                     <div className='flex justify-center content-center items-center gap-5 '>
                         <button
