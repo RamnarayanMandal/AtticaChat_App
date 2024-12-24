@@ -44,12 +44,28 @@ const AtticDashboard = () => {
         console.error("Error fetching employees:", error);
       }
     };
-    
+
     fetchEmployees();
   }, []);
 
   const uniqueBranches = new Set(manager.map((item) => item.branch_name));
   const totalBranches = uniqueBranches.size;
+
+  // Options that require TETable rendering
+  const teTableOptions = [
+    "TE",
+    "Accountant",
+    "Software",
+    "HR",
+    "CallCenter",
+    "VirtualTeam",
+    "MonitoringTeam",
+    "Bouncers/Driver",
+    "Security/CCTV",
+    "DigitalMarketing",
+    "Logistic",
+    "Cashier",
+  ];
 
   return (
     <div className="lg:flex block bg-cover bg-center min-h-screen relative bg-[#e8effe]">
@@ -61,7 +77,7 @@ const AtticDashboard = () => {
 
         {/* Dropdown menu for selecting view */}
         <div className="mb-4">
-          <label htmlFor="viewOption" className="mr-2 font-semibold">View:</label>
+          <label htmlFor="viewOption" className="mr-2 font-semibold text-xl font-serif font-semibold">Select User:</label>
           <select
             id="viewOption"
             className="p-2 border border-gray-300 rounded"
@@ -69,7 +85,11 @@ const AtticDashboard = () => {
             onChange={(e) => setViewOption(e.target.value)}
           >
             <option value="manager">Manager</option>
-            <option value="TE">TE</option>
+            {teTableOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
           </select>
         </div>
 
@@ -82,13 +102,13 @@ const AtticDashboard = () => {
               </div>
               <div className="text-2xl text-white">{employee.length}</div>
             </div>
-            <div className="p-4 rounded-lg shadow-lg  bg-cover" style={{ backgroundImage: `url(${back19})` }}>
+            <div className="p-4 rounded-lg shadow-lg bg-cover" style={{ backgroundImage: `url(${back19})` }}>
               <div className="lg:text-xl text-lg font-bold text-white">
                 No of Registered Branch Managers
               </div>
               <div className="text-2xl text-white">{manager.length}</div>
             </div>
-            <div className="p-4 rounded-lg shadow-lg  bg-cover" style={{ backgroundImage: `url(${back13})` }}>
+            <div className="p-4 rounded-lg shadow-lg bg-cover" style={{ backgroundImage: `url(${back13})` }}>
               <div className="lg:text-xl text-lg font-bold text-white">
                 No of Branches
               </div>
@@ -97,18 +117,14 @@ const AtticDashboard = () => {
           </div>
         )}
 
-        {viewOption === "TE" && (
+        {viewOption !== "manager" && teTableOptions.includes(viewOption) && (
           <div>
-            {/* Replace with TE specific content or component */}
-            <p>TE Details</p>
+            <TETable name={viewOption} />  
           </div>
         )}
 
-        {/* Table or component based on selected view */}
-        <div className="w-full">
-          {viewOption === "manager" && <TableSuper />}
-          {viewOption === "TE" && <TETable />}
-        </div>
+        {/* TableSuper component only for managers */}
+        {viewOption === "manager" && <TableSuper />}
       </div>
     </div>
   );

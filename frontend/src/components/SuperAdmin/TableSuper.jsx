@@ -6,10 +6,14 @@ import { BASE_URL } from '../../constants';
 
 const TableSuper = () => {
   const [manager, setManager] = useState([]);
+  const [filteredManagers, setFilteredManagers] = useState([]); // For search
+  const [searchTerm, setSearchTerm] = useState(""); // State for search
+  const [currentPage, setCurrentPage] = useState(1); // Pagination
+  const [managersPerPage] = useState(5); // Rows per page
   const [selectedManager, setSelectedManager] = useState(null);
   const [location, setLocation] = useState([]);
-  const [showMap, setShowMap] = useState(false); 
-  const [selectedDate, setSelectedDate] = useState(new Date()); // State for selected date
+  const [showMap, setShowMap] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     const fetchAllManagers = async () => {
@@ -18,6 +22,7 @@ const TableSuper = () => {
         if (response.ok) {
           const data = await response.json();
           setManager(data);
+          setFilteredManagers(data); // Initialize filtered data
         } else {
           console.error('Failed to fetch AllManagers');
         }
@@ -28,10 +33,22 @@ const TableSuper = () => {
 
     fetchAllManagers();
   }, []);
-  
+
+  const handleSearch = (e) => {
+    const value = e.target.value.toLowerCase();
+    setSearchTerm(value);
+    const filtered = manager.filter(
+      (item) =>
+        item.manager_name.toLowerCase().includes(value) ||
+        item.branch_name.toLowerCase().includes(value)
+    );
+    setFilteredManagers(filtered);
+    setCurrentPage(1); // Reset to first page
+  };
+
   const openModal = async (id, date) => {
     try {
-      const formattedDate = date.toISOString().split('T')[0]; // Format the date to YYYY-MM-DD
+      const formattedDate = date.toISOString().split('T')[0];
       const response = await fetch(`${BASE_URL}/api/location/get-managerlocation/${id}/${formattedDate}`);
       if (response.ok) {
         const data = await response.json();
@@ -53,10 +70,29 @@ const TableSuper = () => {
     }
   };
 
+  // Pagination logic
+  const indexOfLastManager = currentPage * managersPerPage;
+  const indexOfFirstManager = indexOfLastManager - managersPerPage;
+  const currentManagers = filteredManagers.slice(indexOfFirstManager, indexOfLastManager);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
   return (
     <div className='flex flex-wrap w-full'>
-      <div className="p-4 rounded-lg shadow-lg overflow-auto border border-purple-900 w-full ">
+      <div className="p-4 rounded-lg shadow-lg overflow-auto border border-purple-900 w-full">
         <div className="lg:text-xl md:text-xl text-sm font-bold mb-4 text-[#5443c3]">Branch Manager Details</div>
+        
+        {/* Search Bar */}
+        <div className="mb-4">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={handleSearch}
+            placeholder="Search by manager name or branch"
+            className="border rounded px-4 py-2 w-full"
+          />
+        </div>
+        
         <table className="min-w-full bg-white border lg:text-xl md:text-xl text-sm">
           <thead>
             <tr>
@@ -75,7 +111,7 @@ const TableSuper = () => {
             </tr>
           </thead>
           <tbody className="min-w-full bg-white border lg:text-lg md:text-lg text-sm">
-            {manager.map((item, index) => (
+            {currentManagers.map((item, index) => (
               <tr key={index}>
                 <td className="py-2 px-4 border-b text-[#5443c3]">{item._id}</td>
                 <td className="py-2 px-4 border-b text-[#5443c3]">{item.manager_name}</td>
@@ -95,21 +131,35 @@ const TableSuper = () => {
                   Click here
                 </td>
                 <td className="py-2 px-4 border-b">
-                  <DatePicker 
-                    selected={selectedDate} 
-                    onChange={(date) => setSelectedDate(date)} 
+                  <DatePicker
+                    selected={selectedDate}
+                    onChange={(date) => setSelectedDate(date)}
                     dateFormat="yyyy-MM-dd"
-                     className="border rounded px-2 py-1"
+                    className="border rounded px-2 py-1"
                   />
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+        
+        {/* Pagination */}
+        <div className="flex justify-center mt-4">
+          {Array.from({ length: Math.ceil(filteredManagers.length / managersPerPage) }, (_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={`px-3 py-1 mx-1 border rounded ${currentPage === index + 1 ? 'bg-[#5443c3] text-white' : ''}`}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
       </div>
+      
       {showMap && location.length > 0 && (
-        <div className="w-full p-4">
-          <GoogleMapsuper locations={location} onClose={() => setShowMap(false)} className="w-full"/>
+        <div className="w-full p-4 absolute left-0 top-0 z-50">
+          <GoogleMapsuper locations={location} onClose={() => setShowMap(false)} className="w-full" />
         </div>
       )}
     </div>
