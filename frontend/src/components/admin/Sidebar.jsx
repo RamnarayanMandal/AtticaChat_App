@@ -21,27 +21,25 @@ import { FaMoneyBillTrendUp } from "react-icons/fa6";
 import { GrUserManager } from "react-icons/gr";
 import { CgProfile } from "react-icons/cg";
 import { GiLogicGateAnd } from "react-icons/gi";
-import { BASE_URL } from '../../constants';
+import { BASE_URL } from "../../constants";
 import axios from "axios";
-
 
 const Sidebar = () => {
   const navigate = useNavigate();
   const [showEmployeeOptions, setShowEmployeeOptions] = useState(false);
   const [activeRoute, setActiveRoute] = useState("/atticDashboard");
-  const userAdmin = JSON.parse(localStorage.getItem('userAdmin'));
+  const userAdmin = JSON.parse(localStorage.getItem("userAdmin"));
   const [userDetails, setUserDetails] = useState(null);
   const [department, setDepartment] = useState(null);
 
-  const userId = localStorage.getItem('CurrentUserId');
-
+  const userId = localStorage.getItem("CurrentUserId");
 
   const fetchUserDetails = async () => {
     try {
       const resp = await axios.get(`${BASE_URL}/api/admin/admin/${userId}`);
       setUserDetails(resp.data);
-      localStorage.setItem('userDetails',JSON.stringify(resp.data));
-      localStorage.setItem('department', resp.data.department);
+      localStorage.setItem("userDetails", JSON.stringify(resp.data));
+      localStorage.setItem("department", resp.data.department);
       setDepartment(resp.data.department);
     } catch (error) {
       console.error("Fetch User Details Error:", error);
@@ -62,113 +60,226 @@ const Sidebar = () => {
     localStorage.clear();
   };
 
-
   const getRegistrationOptions = () => {
     if (!userDetails) return null;
 
     switch (userDetails.department) {
-      case 'Employee':
+      case "Employee":
         return [
-          { route: "/register", icon: IoPersonSharp, label: "Employee Registration" },
-
+          {
+            route: "/register",
+            icon: IoPersonSharp,
+            label: "Employee Registration",
+          },
         ];
-      case 'Digital Marketing':
+      case "Digital Marketing":
         return [
-          { route: "/AccountsReg/Digital Marketing", icon: FaLaptop, label: "Digital Marketing Team Registration" }
+          {
+            route: "/AccountsReg/Digital Marketing",
+            icon: FaLaptop,
+            label: "Digital Marketing Team Registration",
+          },
         ];
-      case 'VirtualTeam':
+      case "VirtualTeam":
         return [
-          { route: "/VirtualTeamReg", icon: GrVirtualMachine, label: "Virtual Team Registration" }
+          {
+            route: "/VirtualTeamReg",
+            icon: GrVirtualMachine,
+            label: "Virtual Team Registration",
+          },
         ];
-      case 'CallCenter':
+      case "CallCenter":
         return [
-          { route: "/CallCenterReg", icon: MdAddCall, label: "Call Center Team Registration" }
+          {
+            route: "/CallCenterReg",
+            icon: MdAddCall,
+            label: "Call Center Team Registration",
+          },
         ];
-      case 'Accountant':
+      case "Accountant":
         return [
-          {  route: `/AccountsReg/Accountant`, icon: MdAccountTree, label: "Accounts Team Registration" }
+          {
+            route: `/AccountsReg/Accountant`,
+            icon: MdAccountTree,
+            label: "Accounts Team Registration",
+          },
         ];
-      case 'MonitoringTeam':
+      case "MonitoringTeam":
         return [
-          { route: "/AccountsReg/MonitoringTeam", icon: FaHourglassHalf, label: "Monitoring Team Registration" }
+          {
+            route: "/AccountsReg/MonitoringTeam",
+            icon: FaHourglassHalf,
+            label: "Monitoring Team Registration",
+          },
         ];
-      case 'Bouncers/Driver':
+      case "Bouncers/Driver":
         return [
-          { route: "/AccountsReg/Bouncers", icon: TbBounceLeft, label: "Bouncer Registration" }
+          {
+            route: "/AccountsReg/Bouncers",
+            icon: TbBounceLeft,
+            label: "Bouncer Registration",
+          },
         ];
-      case 'Software':
+      case "Software":
         return [
-          { route: "/AccountsReg/Software", icon: GrCloudSoftware, label: "Software Registration" }
+          {
+            route: "/AccountsReg/Software",
+            icon: GrCloudSoftware,
+            label: "Software Registration",
+          },
         ];
-      case 'HR':
+      case "HR":
         return [
-          { route: "/AccountsReg/HR", icon: GiHumanTarget, label: "Hr Registration" }
+          {
+            route: "/AccountsReg/HR",
+            icon: GiHumanTarget,
+            label: "Hr Registration",
+          },
         ];
-      case 'TE':
+      case "TE":
         return [
-          { route: "/AccountsReg/TE", icon: GiHumanTarget, label: "TE Registration" }
+          {
+            route: "/AccountsReg/TE",
+            icon: GiHumanTarget,
+            label: "TE Registration",
+          },
         ];
-      case 'Security':
+      case "Security":
         return [
-          { route: "/AccountsReg/Security", icon: MdSecurity, label: "Security Registration" }
+          {
+            route: "/AccountsReg/Security",
+            icon: MdSecurity,
+            label: "Security Registration",
+          },
         ];
-      case 'Logistic':
+      case "Logistic":
         return [
-          { route: "/AccountsReg/Logistic", icon: GiLogicGateAnd, label: "Logistic Registration" }
+          {
+            route: "/AccountsReg/Logistic",
+            icon: GiLogicGateAnd,
+            label: "Logistic Registration",
+          },
         ];
-      case 'Cashier':
+      case "Cashier":
         return [
-          { route: "/AccountsReg/Cashier", icon: GiLogicGateAnd, label: "Cashier Registration" }
+          {
+            route: "/AccountsReg/Cashier",
+            icon: GiLogicGateAnd,
+            label: "Cashier Registration",
+          },
         ];
-      case 'Manager':
+      case "Manager":
         return [
-          { route: "/managerRegister", icon: GrUserManager, label: "Manager Registration" },
+          {
+            route: "/managerRegister",
+            icon: GrUserManager,
+            label: "Manager Registration",
+          },
         ];
-      case 'Billing_Team':
+      case "Billing_Team":
         return [
-          { route: "/billingTeamRegister", icon: FaMoneyBillTrendUp, label: "Billing Team Registration" },
-        ]
-      case 'Admin':
+          {
+            route: "/billingTeamRegister",
+            icon: FaMoneyBillTrendUp,
+            label: "Billing Team Registration",
+          },
+        ];
+      case "Admin":
         return [
-          { route: "/register", icon: IoPersonSharp, label: "Employee Registration" },
-          { route: "/billingTeamRegister", icon: FaMoneyBillTrendUp, label: "Billing Team Registration" },
-          { route: "/managerRegister", icon: GrUserManager, label: "Manager Registration" },
-          { route: "/AccountsReg/Digital Marketing", icon: FaLaptop, label: "Digital Marketing Team Registration" },
-          { route: "/AccountsReg/VirtualTeam", icon: GrVirtualMachine, label: "Virtual Team Registration" },
-          { route: "/AccountsReg/CallCenter", icon: MdAddCall, label: "Call Center Team Registration" },
-          { route:"/AccountsReg/Accountant", icon: MdAccountTree, label: "Accounts Team Registration" },
-          { route: "/AccountsReg/MonitoringTeam", icon: FaHourglassHalf, label: "Monitoring Team Registration" },
-          { route: "/AccountsReg/Bouncers", icon: TbBounceLeft, label: "Bouncer Registration" },
-          { route: "/AccountsReg/Software", icon: GrCloudSoftware, label: "Software Registration" },
-          { route: "/AccountsReg/HR", icon: GiHumanTarget, label: "Hr Registration" },
-          { route: "/AccountsReg/TE", icon: GiHumanTarget, label: "TE Registration" },
-          { route: "/AccountsReg/Security", icon: MdSecurity, label: "Security Registration" },
-          { route: "/AccountsReg/Logistic", icon: GiLogicGateAnd, label: "Logistic Registration" },
-          { route: "/AccountsReg/Cashier", icon: GiLogicGateAnd, label: "Cashier Registration" }
+          {
+            route: "/register",
+            icon: IoPersonSharp,
+            label: "Employee Registration",
+          },
+          {
+            route: "/billingTeamRegister",
+            icon: FaMoneyBillTrendUp,
+            label: "Billing Team Registration",
+          },
+          {
+            route: "/managerRegister",
+            icon: GrUserManager,
+            label: "Manager Registration",
+          },
+          {
+            route: "/AccountsReg/Digital Marketing",
+            icon: FaLaptop,
+            label: "Digital Marketing Team Registration",
+          },
+          {
+            route: "/AccountsReg/VirtualTeam",
+            icon: GrVirtualMachine,
+            label: "Virtual Team Registration",
+          },
+          {
+            route: "/AccountsReg/CallCenter",
+            icon: MdAddCall,
+            label: "Call Center Team Registration",
+          },
+          {
+            route: "/AccountsReg/Accountant",
+            icon: MdAccountTree,
+            label: "Accounts Team Registration",
+          },
+          {
+            route: "/AccountsReg/MonitoringTeam",
+            icon: FaHourglassHalf,
+            label: "Monitoring Team Registration",
+          },
+          {
+            route: "/AccountsReg/Bouncers",
+            icon: TbBounceLeft,
+            label: "Bouncer Registration",
+          },
+          {
+            route: "/AccountsReg/Software",
+            icon: GrCloudSoftware,
+            label: "Software Registration",
+          },
+          {
+            route: "/AccountsReg/HR",
+            icon: GiHumanTarget,
+            label: "Hr Registration",
+          },
+          {
+            route: "/AccountsReg/TE",
+            icon: GiHumanTarget,
+            label: "TE Registration",
+          },
+          {
+            route: "/AccountsReg/Security",
+            icon: MdSecurity,
+            label: "Security Registration",
+          },
+          {
+            route: "/AccountsReg/Logistic",
+            icon: GiLogicGateAnd,
+            label: "Logistic Registration",
+          },
+          {
+            route: "/AccountsReg/Cashier",
+            icon: GiLogicGateAnd,
+            label: "Cashier Registration",
+          },
         ];
       default:
         return [];
     }
   };
 
-  const handleannoument = async()=>{
-      
-    if(department === "Bouncers/Driver"){
-          navigate ("/announcement/Bouncers")
-    }
-    else if(department=== "Security/CCTV"){
-       navigate("/announcement/Security")
-
-    }
-    else if(department === "Admin"){
-       navigate("/announcement")
-    }
-    else{
-         navigate(`/announcement/${department}`)
+  const handleannoument = async () => {
+    if (department === "Bouncers/Driver") {
+      navigate("/announcement/Bouncers");
+    } else if (department === "Security/CCTV") {
+      navigate("/announcement/Security");
+    } else if (department === "Admin") {
+      navigate("/announcement");
+    } else {
+      navigate(`/announcement/${department}`);
     }
 
-       setActiveRoute("/announcement")
-  }
+    setActiveRoute("/announcement");
+  };
 
   return (
     <div className="flex justify-evenly flex-row lg:flex-col h-[80px] lg:h-screen w-screen lg:w-[100px] left-0 bg-[#5443c3] border-b lg:border-r shadow-md lg:justify-between items-center py-[10px] lg:py-[20px] text-gray-500">
@@ -179,10 +290,11 @@ const Sidebar = () => {
       <div className="flex flex-row lg:flex-col gap-2 md:gap-3 lg:gap-5 relative">
         <div
           onClick={handleannoument}
-          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${activeRoute === "/announcement"
-            ? "bg-blue-500 text-white"
-            : "bg-[#fffefd]"
-            }`}
+          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${
+            activeRoute === "/announcement"
+              ? "bg-blue-500 text-white"
+              : "bg-[#fffefd]"
+          }`}
         >
           <GrAnnounce className="text-lg md:text-2xl lg:text-3xl" />
           <span className="absolute lg:bottom-auto lg:left-full mt-16 lg:ml-0 lg:mt-2 whitespace-nowrap z-50 bg-black text-white text-xs md:text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -192,10 +304,11 @@ const Sidebar = () => {
 
         <div
           onClick={() => handleNavigation("/admindashboard")}
-          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 cursor-pointer ${activeRoute === "/atticDashboard"
-            ? "bg-blue-500 text-white"
-            : "bg-[#fffefd]"
-            }`}
+          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 cursor-pointer ${
+            activeRoute === "/atticDashboard"
+              ? "bg-blue-500 text-white"
+              : "bg-[#fffefd]"
+          }`}
         >
           <MdDashboard className="text-lg md:text-2xl lg:text-3xl" />
           <span className="absolute lg:bottom-auto lg:left-full mt-16 lg:ml-0 lg:mt-2 z-50 whitespace-nowrap bg-black text-white text-xs md:text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -205,10 +318,11 @@ const Sidebar = () => {
 
         <div
           onClick={() => handleNavigation("/Groups")}
-          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${activeRoute === "/Groups"
-            ? "bg-blue-500 text-white"
-            : "bg-[#fffefd]"
-            }`}
+          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${
+            activeRoute === "/Groups"
+              ? "bg-blue-500 text-white"
+              : "bg-[#fffefd]"
+          }`}
         >
           <GrChatOption className="text-lg md:text-2xl lg:text-3xl" />
           <span className="absolute lg:bottom-auto lg:left-full mt-16 lg:ml-0 lg:mt-2 whitespace-nowrap z-50 bg-black text-white text-xs md:text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -219,14 +333,19 @@ const Sidebar = () => {
         <div
           onMouseEnter={() => setShowEmployeeOptions(true)}
           onMouseLeave={() => setShowEmployeeOptions(false)}
-          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 cursor-pointer z-50 ${getRegistrationOptions()?.some(option => option.route === activeRoute)
-            ? "bg-blue-500 text-white"
-            : "bg-[#fffefd]"
-            }`}
+          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 cursor-pointer z-50 ${
+            getRegistrationOptions()?.some(
+              (option) => option.route === activeRoute
+            )
+              ? "bg-blue-500 text-white"
+              : "bg-[#fffefd]"
+          }`}
         >
           <PersonAddIcon className="text-lg md:text-2xl lg:text-3xl" />
           <span
-            className={`absolute lg:bottom-auto lg:w-96 lg:left-full top-12 -right-20 lg:ml-0 lg:mt-2 whitespace-nowrap bg-[#f6f5fb] text-[#5443c3] border border-[#5443c3] text-xs lg:text-lg md:text-sm rounded py-6 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${userDetails?.department === 'Admin' ? 'lg:-top-60' : 'lg:top-0'}`}
+            className={`absolute lg:bottom-auto lg:w-96 lg:left-full top-12 -right-20 lg:ml-0 lg:mt-2 whitespace-nowrap bg-[#f6f5fb] text-[#5443c3] border border-[#5443c3] text-xs lg:text-lg md:text-sm rounded py-6 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+              userDetails?.department === "Admin" ? "lg:-top-60" : "lg:top-0"
+            }`}
             style={{ display: showEmployeeOptions ? "block" : "none" }}
           >
             {getRegistrationOptions()?.map((option, index) => (
@@ -242,38 +361,33 @@ const Sidebar = () => {
           </span>
         </div>
 
-
         <div
           onClick={() => handleNavigation("/adminToemp")}
-          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${activeRoute === "/ChatPage"
-            ? "bg-blue-500 text-white"
-            : "bg-[#fffefd]"
-            }`}
+          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${
+            activeRoute === "/ChatPage"
+              ? "bg-blue-500 text-white"
+              : "bg-[#fffefd]"
+          }`}
         >
           <BsChatSquareDots className="text-lg md:text-2xl lg:text-3xl" />
           <span className="absolute lg:bottom-auto lg:left-full mt-16 lg:ml-0 lg:mt-2 whitespace-nowrap z-50 bg-black text-white text-xs md:text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             Chat Page
           </span>
         </div>
-
-        
       </div>
 
       <div
-         
-          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${activeRoute === "/profile"
-            ? "bg-blue-500 text-white"
-            : "bg-[#fffefd]"
-            }`}
-        >
-          <CgProfile className="text-lg md:text-2xl lg:text-3xl" />
-          <span className="absolute lg:bottom-auto lg:left-full mt-16 lg:ml-0 lg:mt-2 whitespace-nowrap bg-black text-white text-xs md:text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div>Name: {userDetails?.name}</div>
-            <div>Email: {userDetails?.email}</div>
-            <div>Department: {userDetails?.department}</div>
-
-          </span>
-        </div>
+        className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${
+          activeRoute === "/profile" ? "bg-blue-500 text-white" : "bg-[#fffefd]"
+        }`}
+      >
+        <CgProfile className="text-lg md:text-2xl lg:text-3xl" />
+        <span className="absolute lg:bottom-auto lg:left-full mt-16 lg:ml-0 lg:mt-2 whitespace-nowrap bg-black text-white text-xs md:text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div>Name: {userDetails?.name}</div>
+          <div>Email: {userDetails?.email}</div>
+          <div>Department: {userDetails?.department}</div>
+        </span>
+      </div>
 
       <div className="relative flex flex-row lg:flex-col gap-3 lg:gap-5 lg:pb-5 items-center">
         <div
@@ -285,9 +399,6 @@ const Sidebar = () => {
             logout
           </span>
         </div>
-
-        
-
       </div>
     </div>
   );
