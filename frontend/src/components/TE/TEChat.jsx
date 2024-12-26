@@ -12,11 +12,12 @@ import ReplyModel from "../ReplyModel";
 import { FaArrowLeft, FaCamera } from "react-icons/fa";
 import { IoMdSend } from "react-icons/io";
 import Camera from "../Camera/Camera";
-import ScrollingNavbar from "../admin/ScrollingNavbar";  
+import ScrollingNavbar from "../admin/ScrollingNavbar";
 import EditModel from "../utility/EditModel";
 import ScrollToBottomButton from "../utility/ScrollToBottomButton";
 import { FaVideo } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import GPSTracker from "../manager/Gps";
 
 function TEChat() {
   const [messages, setMessages] = useState([]);
@@ -41,23 +42,33 @@ function TEChat() {
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showImageEditor, setShowImageEditor] = useState(false);
-  const [imageForEditing, setImageForEditing] = useState('');
-
+  const [imageForEditing, setImageForEditing] = useState("");
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
-  const [newCountMessage, setNewCountMessage] = useState(() => JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() => JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-  const [currentCountMessage, setCurrentCountMessage] = useState(() => JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+  const [newCountMessage, setNewCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+  );
+  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() =>
+    JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+  );
+  const [currentCountMessage, setCurrentCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+  );
 
-  const navigate = useNavigate()
- 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLastUserMessageCounts(JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-      setNewCountMessage(JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-      setCurrentCountMessage(JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+      setLastUserMessageCounts(
+        JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+      );
+      setNewCountMessage(
+        JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+      );
+      setCurrentCountMessage(
+        JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+      );
     }, 1000); // Update every second
 
     return () => clearInterval(intervalId); // Clean up on component unmount
@@ -65,25 +76,36 @@ function TEChat() {
 
   const handleClick = (id, name) => {
     // Get the current count message and last user message counts from local storage
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
     // Update lastUserMessageCounts with currentCountMessage for the clicked user
     const updatedLastUserMessageCounts = lastUserMessageCounts.map((user) => {
       if (user.userId === id) {
-        return { userId: user.userId, count: currentCountMessage.find((u) => u.userId === id)?.count || 0 };
+        return {
+          userId: user.userId,
+          count: currentCountMessage.find((u) => u.userId === id)?.count || 0,
+        };
       }
       return user;
     });
 
     // If the user is not in lastUserMessageCounts, add them
     if (!updatedLastUserMessageCounts.some((user) => user.userId === id)) {
-      const currentCount = currentCountMessage.find((u) => u.userId === id)?.count || 0;
+      const currentCount =
+        currentCountMessage.find((u) => u.userId === id)?.count || 0;
       updatedLastUserMessageCounts.push({ userId: id, count: currentCount });
     }
 
     // Store the updated lastUserMessageCounts in local storage
-    localStorage.setItem("lastUserMessageCounts", JSON.stringify(updatedLastUserMessageCounts));
+    localStorage.setItem(
+      "lastUserMessageCounts",
+      JSON.stringify(updatedLastUserMessageCounts)
+    );
 
     // Set the state and fetch messages
     setSender(loggedInUserId);
@@ -95,22 +117,29 @@ function TEChat() {
 
   // Function to get the count for a user
   const getCountForUser = (userId) => {
-    const newCountMessage = JSON.parse(localStorage.getItem("newCountMessage") || "[]");
+    const newCountMessage = JSON.parse(
+      localStorage.getItem("newCountMessage") || "[]"
+    );
     const user = newCountMessage.find((item) => item.userId === userId);
     return user ? user.count : 0;
   };
 
   // Function to get the unread count for a user
   const getUnreadCountForUser = (userId) => {
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
-    const currentCount = currentCountMessage.find((user) => user.userId === userId)?.count || 0;
-    const lastCount = lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
+    const currentCount =
+      currentCountMessage.find((user) => user.userId === userId)?.count || 0;
+    const lastCount =
+      lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
 
     return currentCount - lastCount;
   };
-
 
   const fetchMessages = (sender, recipient) => {
     axios
@@ -152,7 +181,7 @@ function TEChat() {
     const messageData = {
       sender: loggedInUserId,
       recipient: recipient,
-      senderName:userDetails.name,
+      senderName: userDetails.name,
       text: newMessage,
       image: attachment?.type.startsWith("image/") ? attachment.url : null,
       document: attachment?.type.startsWith("application/")
@@ -266,47 +295,50 @@ function TEChat() {
     setShowCamera(false);
   };
   const handleModalClose = () => {
-    setImageForEditing(''); // Close the modal and reset selected image
+    setImageForEditing(""); // Close the modal and reset selected image
     setShowImageEditor(false); // Close edit modal
   };
   const handleEditImage = (message) => {
     setShowImageEditor(true);
-    setImageForEditing((message.content.image || message.content.camera));
+    setImageForEditing(message.content.image || message.content.camera);
     // console.log("*******",imageForEditing)
   };
 
   const handleDelete = (message) => {
     axios
-     .delete(`${BASE_URL}/api/delmessages/${message._id}`)
-     .then((response) => {
-      
-        setMessages(messages.filter((m) => m._id!== message._id));
-        setShowDropdown("null")
+      .delete(`${BASE_URL}/api/delmessages/${message._id}`)
+      .then((response) => {
+        setMessages(messages.filter((m) => m._id !== message._id));
+        setShowDropdown("null");
       })
 
-     .catch((error) => {
+      .catch((error) => {
         console.error(error);
       });
   };
   const sortedUsers = users
-  .filter((user) =>
-    user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
-  )
-  .map((user) => ({
-    ...user,
-    unreadCount: getUnreadCountForUser(user._id),
-  }))
-  .sort((a, b) => b.unreadCount - a.unreadCount);
+    .filter((user) =>
+      user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
+    )
+    .map((user) => ({
+      ...user,
+      unreadCount: getUnreadCountForUser(user._id),
+    }))
+    .sort((a, b) => b.unreadCount - a.unreadCount);
 
   const handleVideoCall = () => {
-    navigate(`/videoCall/${recipient}`)
-  }
+    navigate(`/videoCall/${recipient}`);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden ">
-     
-   
-      {!showChat && <span className="mt-20"><ScrollingNavbar  /></span>}
+      <GPSTracker managerId={loggedInUserId} path={"te-location"} />
+
+      {!showChat && (
+        <span className="mt-20">
+          <ScrollingNavbar />
+        </span>
+      )}
       <UserSidebar value="TE" />
       {showChat ? (
         <div className="w-full mb-20 lg:mb-0 flex flex-col justify-between overflow-hidden">
@@ -319,7 +351,7 @@ function TEChat() {
             </button>
 
             <h1 className="lg:text-2xl text-xl font-bold">{recipientName}</h1>
-            <FaVideo className="text-2xl" onClick={handleVideoCall}/>
+            <FaVideo className="text-2xl" onClick={handleVideoCall} />
           </div>
           <div className="flex-grow overflow-y-auto p-4 flex flex-col bg-[#eef2fa]">
             {messages.map((message, index) => (
@@ -368,7 +400,7 @@ function TEChat() {
                     Your browser does not support the video tag.
                   </video>
                 )}
-                {message.content && message.content. camera && (
+                {message.content && message.content.camera && (
                   <img
                     src={message.content.camera}
                     alt="Image"
@@ -386,49 +418,51 @@ function TEChat() {
                   />
                 )}
 
-{showDropdown === index && (
-                    <div className="absolute top-8 right-2 bg-white border rounded shadow-lg z-10">
+                {showDropdown === index && (
+                  <div className="absolute top-8 right-2 bg-white border rounded shadow-lg z-10">
+                    <button
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => handleReply(message)}
+                    >
+                      Reply
+                    </button>
+                    <button
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => handleForward(message)}
+                    >
+                      Forward
+                    </button>
+                    {(message.content.image || message.content.camera) && (
                       <button
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => handleReply(message)}
+                        onClick={() => handleEditImage(message)}
                       >
-                        Reply
+                        Edit Image
                       </button>
+                    )}
+                    {message.sender === loggedInUserId && (
                       <button
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => handleForward(message)}
+                        onClick={() => handleDelete(message)}
                       >
-                        Forward
+                        delete
                       </button>
-                      {(message.content.image || message.content.camera) && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleEditImage(message)}
-                        >
-                          Edit Image
-                        </button>
-                      )}
-                      {
-                      message.sender === loggedInUserId && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleDelete(message)}
-                        >
-                          delete
-                        </button>
-                      )
-                    }
-                    </div>
-                  )}
+                    )}
+                  </div>
+                )}
               </div>
             ))}
             <div ref={messagesEndRef} />
             {showCamera && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-                <Camera onCapture={handleCapture} onClose={handleCloseCamera} loggedInUserId={loggedInUserId} recipient={recipient}  />
+                <Camera
+                  onCapture={handleCapture}
+                  onClose={handleCloseCamera}
+                  loggedInUserId={loggedInUserId}
+                  recipient={recipient}
+                />
               </div>
             )}
-
           </div>
           <div className="flex items-center p-4 bg-[#eef2fa] border-t border-gray-200 fixed bottom-0 w-full lg:static">
             <input
@@ -458,9 +492,13 @@ function TEChat() {
               <IoMdSend />
             </button>
 
-            <AllUsersFileModel sender={loggedInUserId} recipient={recipient} senderName={userDetails.name} />
+            <AllUsersFileModel
+              sender={loggedInUserId}
+              recipient={recipient}
+              senderName={userDetails.name}
+            />
           </div>
-          <ScrollToBottomButton messagesEndRef={messagesEndRef}/>
+          <ScrollToBottomButton messagesEndRef={messagesEndRef} />
         </div>
       ) : (
         <div className="w-full lg:w-1/4 bg-white p-4 overflow-y-auto sticky lg:mt-20 border border-purple-100 top-0  z-10">
@@ -481,10 +519,13 @@ function TEChat() {
             {sortedUsers.map((user) => (
               <li
                 key={user._id}
-                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${unreadUsers.some((unreadUser) => unreadUser.userId === user._id)
-                  ? "bg-blue-200"
-                  : "bg-gray-200"
-                  } ${recipient === user._id ? "bg-green-200" : ""}`}
+                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${
+                  unreadUsers.some(
+                    (unreadUser) => unreadUser.userId === user._id
+                  )
+                    ? "bg-blue-200"
+                    : "bg-gray-200"
+                } ${recipient === user._id ? "bg-green-200" : ""}`}
                 onClick={() => handleClick(user._id, user.name)}
               >
                 <span>{user.name}</span>
@@ -498,8 +539,6 @@ function TEChat() {
               </li>
             ))}
           </ul>
-
-
         </div>
       )}
       {showForwardModal && (
@@ -526,7 +565,6 @@ function TEChat() {
           imageUrl={imageForEditing}
           handleModalClose={handleModalClose}
           recipient={recipient}
-          
         />
       )}
     </div>

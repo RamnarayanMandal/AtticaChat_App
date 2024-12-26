@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { AiOutlineSearch, AiOutlineDown } from "react-icons/ai";
@@ -15,13 +14,13 @@ import ReplyModel from "../ReplyModel";
 import { IoMdSend } from "react-icons/io";
 import { FaArrowLeft } from "react-icons/fa";
 import Camera from "../Camera/Camera";
-import ScrollingNavbar from '../../components/admin/ScrollingNavbar'
+import ScrollingNavbar from "../../components/admin/ScrollingNavbar";
 import EditModel from "../utility/EditModel";
 import ScrollToBottomButton from "../utility/ScrollToBottomButton";
 // import UserSidebar from "../AllUsers/UserSidebar";
 import { FaVideo } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-
+import GPSTracker from "../manager/Gps";
 
 function AccountToAccountChat() {
   const [messages, setMessages] = useState([]);
@@ -46,21 +45,32 @@ function AccountToAccountChat() {
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showImageEditor, setShowImageEditor] = useState(false);
-  const [imageForEditing, setImageForEditing] = useState('');
+  const [imageForEditing, setImageForEditing] = useState("");
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
-  const [newCountMessage, setNewCountMessage] = useState(() => JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() => JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-  const [currentCountMessage, setCurrentCountMessage] = useState(() => JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+  const [newCountMessage, setNewCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+  );
+  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() =>
+    JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+  );
+  const [currentCountMessage, setCurrentCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+  );
 
- const navigate = useNavigate()
- 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLastUserMessageCounts(JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-      setNewCountMessage(JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-      setCurrentCountMessage(JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+      setLastUserMessageCounts(
+        JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+      );
+      setNewCountMessage(
+        JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+      );
+      setCurrentCountMessage(
+        JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+      );
     }, 1000); // Update every second
 
     return () => clearInterval(intervalId); // Clean up on component unmount
@@ -68,25 +78,36 @@ function AccountToAccountChat() {
 
   const handleClick = (id, name) => {
     // Get the current count message and last user message counts from local storage
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
     // Update lastUserMessageCounts with currentCountMessage for the clicked user
     const updatedLastUserMessageCounts = lastUserMessageCounts.map((user) => {
       if (user.userId === id) {
-        return { userId: user.userId, count: currentCountMessage.find((u) => u.userId === id)?.count || 0 };
+        return {
+          userId: user.userId,
+          count: currentCountMessage.find((u) => u.userId === id)?.count || 0,
+        };
       }
       return user;
     });
 
     // If the user is not in lastUserMessageCounts, add them
     if (!updatedLastUserMessageCounts.some((user) => user.userId === id)) {
-      const currentCount = currentCountMessage.find((u) => u.userId === id)?.count || 0;
+      const currentCount =
+        currentCountMessage.find((u) => u.userId === id)?.count || 0;
       updatedLastUserMessageCounts.push({ userId: id, count: currentCount });
     }
 
     // Store the updated lastUserMessageCounts in local storage
-    localStorage.setItem("lastUserMessageCounts", JSON.stringify(updatedLastUserMessageCounts));
+    localStorage.setItem(
+      "lastUserMessageCounts",
+      JSON.stringify(updatedLastUserMessageCounts)
+    );
 
     // Set the state and fetch messages
     setSender(loggedInUserId);
@@ -98,22 +119,29 @@ function AccountToAccountChat() {
 
   // Function to get the count for a user
   const getCountForUser = (userId) => {
-    const newCountMessage = JSON.parse(localStorage.getItem("newCountMessage") || "[]");
+    const newCountMessage = JSON.parse(
+      localStorage.getItem("newCountMessage") || "[]"
+    );
     const user = newCountMessage.find((item) => item.userId === userId);
     return user ? user.count : 0;
   };
 
   // Function to get the unread count for a user
   const getUnreadCountForUser = (userId) => {
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
-    const currentCount = currentCountMessage.find((user) => user.userId === userId)?.count || 0;
-    const lastCount = lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
+    const currentCount =
+      currentCountMessage.find((user) => user.userId === userId)?.count || 0;
+    const lastCount =
+      lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
 
     return currentCount - lastCount;
   };
-
 
   const fetchMessages = (sender, recipient) => {
     axios
@@ -139,9 +167,6 @@ function AccountToAccountChat() {
         console.error(error);
       });
   };
-  
-
-
 
   useEffect(() => {
     axios
@@ -157,10 +182,11 @@ function AccountToAccountChat() {
       });
   }, []);
 
-
-
   useEffect(() => {
-    const intervalId = setInterval(() => fetchMessages(sender, recipient), 2000);
+    const intervalId = setInterval(
+      () => fetchMessages(sender, recipient),
+      2000
+    );
     return () => clearInterval(intervalId);
   }, [sender, recipient]);
 
@@ -191,10 +217,9 @@ function AccountToAccountChat() {
   //     });
   // };
 
-
   const handleSendMessage = () => {
     if (!newMessage.trim() && !attachment) return;
-  
+
     const messageData = {
       sender: loggedInUserId,
       recipient: recipient,
@@ -206,14 +231,14 @@ function AccountToAccountChat() {
         : null,
       video: attachment?.type.startsWith("video/") ? attachment.url : null,
     };
-  
+
     axios
       .post(`${BASE_URL}/api/postmessages`, messageData)
       .then((response) => {
         setMessages([...messages, response.data.data]);
         setNewMessage("");
         setAttachment(null);
-  
+
         // Update user list based on latest message time
         setUsers((prevUsers) =>
           prevUsers
@@ -232,7 +257,6 @@ function AccountToAccountChat() {
         console.error(error);
       });
   };
-
 
   const handleFileUpload = (file) => {
     const reader = new FileReader();
@@ -267,8 +291,6 @@ function AccountToAccountChat() {
       return () => clearInterval(intervalId);
     }
   }, [users]);
-
-
 
   const handleBackToEmployees = () => {
     setShowChat(false);
@@ -311,7 +333,6 @@ function AccountToAccountChat() {
   };
 
   const handleForwardMessage = () => {
-
     setShowForwardModal(false);
     setShowDropdown(null);
   };
@@ -330,72 +351,75 @@ function AccountToAccountChat() {
   };
 
   const handleModalClose = () => {
-    setImageForEditing(''); // Close the modal and reset selected image
+    setImageForEditing(""); // Close the modal and reset selected image
     setShowImageEditor(false); // Close edit modal
   };
   const handleEditImage = (message) => {
     setShowImageEditor(true);
-    setImageForEditing((message.content.image||message.content.camera));
+    setImageForEditing(message.content.image || message.content.camera);
     // console.log("*******",imageForEditing)
   };
 
   const handleDelete = (message) => {
     axios
-     .delete(`${BASE_URL}/api/delmessages/${message._id}`)
-     .then((response) => {
-      
-        setMessages(messages.filter((m) => m._id!== message._id));
-        setShowDropdown("null")
+      .delete(`${BASE_URL}/api/delmessages/${message._id}`)
+      .then((response) => {
+        setMessages(messages.filter((m) => m._id !== message._id));
+        setShowDropdown("null");
       })
 
-     .catch((error) => {
+      .catch((error) => {
         console.error(error);
       });
   };
   const sortedUsers = users
-  .filter((user) =>
-    user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
-  )
-  .map((user) => ({
-    ...user,
-    unreadCount: getUnreadCountForUser(user._id),
-  }))
-  .sort((a, b) => b.unreadCount - a.unreadCount);
-  
+    .filter((user) =>
+      user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
+    )
+    .map((user) => ({
+      ...user,
+      unreadCount: getUnreadCountForUser(user._id),
+    }))
+    .sort((a, b) => b.unreadCount - a.unreadCount);
 
-  const handleVideoCall= ()=>{
-    navigate(`/videoCall/${recipient}`)
-  }
+  const handleVideoCall = () => {
+    navigate(`/videoCall/${recipient}`);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
+      <GPSTracker managerId={loggedInUserId} path={"te-location"} />
 
-{!showChat && <span className="mt-20"><ScrollingNavbar /></span>}
+      {!showChat && (
+        <span className="mt-20">
+          <ScrollingNavbar />
+        </span>
+      )}
       <UserSidebar value="ACCOUNT" className="mt-11 lg:mt-0" />
-      
+
       {showChat ? (
         <div className="w-full mb-20 lg:mb-0 flex flex-col justify-between overflow-hidden">
           <div className="flex items-center justify-between p-4 lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white sticky top-0 z-10 border border-[#5443c3]">
             <button
               onClick={handleBackToEmployees}
-             className="lg:text-2xl p-2 rounded-md lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white"
+              className="lg:text-2xl p-2 rounded-md lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white"
             >
               <FaArrowLeft className="lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white lg:text-2xl text-xl" />
             </button>
 
             <h1 className="lg:text-2xl text-xl font-bold">{recipientName}</h1>
-            <FaVideo className="text-2xl" onClick={handleVideoCall}/>
+            <FaVideo className="text-2xl" onClick={handleVideoCall} />
           </div>
 
           <div className="flex-grow overflow-y-auto p-4 flex flex-col bg-[#eef2fa] h-screen pr-20">
             {messages.map((message, index) => (
               <div
                 key={message._id}
-                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap lg:text-3xl md:text-xl text-sm font-bold ${message.sender === loggedInUserId
-                  ? "self-end bg-[#e1dff3] text-[#5443c3] border border-[#5443c3] rounded-tr-3xl rounded-bl-3xl"
-                  : "self-start bg-[#ffffff] text-[#5443c3] border border-[#5443c3] rounded-tl-3xl rounded-br-3xl"
-                  }`}
-
+                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap lg:text-3xl md:text-xl text-sm font-bold ${
+                  message.sender === loggedInUserId
+                    ? "self-end bg-[#e1dff3] text-[#5443c3] border border-[#5443c3] rounded-tr-3xl rounded-bl-3xl"
+                    : "self-start bg-[#ffffff] text-[#5443c3] border border-[#5443c3] rounded-tl-3xl rounded-br-3xl"
+                }`}
                 onMouseEnter={() => handleHover(index)}
                 onMouseLeave={() => setHoveredMessage(null)}
               >
@@ -407,7 +431,9 @@ function AccountToAccountChat() {
                   </div>
                 )}
                 {message.content && message.content.text && (
-                  <p className="font-bold lg:text-base text-sm ">{message.content.text}</p>
+                  <p className="font-bold lg:text-base text-sm ">
+                    {message.content.text}
+                  </p>
                 )}
                 {message.content && message.content.image && (
                   <img
@@ -421,7 +447,7 @@ function AccountToAccountChat() {
                     href={message.content.document}
                     target="_blank"
                     rel="noopener noreferrer"
-                   className="text-orange-500 hover:underline lg:text-8xl md:text-6xl text-4xl"
+                    className="text-orange-500 hover:underline lg:text-8xl md:text-6xl text-4xl"
                   >
                     <IoIosDocument className="text-9xl" />
                   </a>
@@ -434,7 +460,10 @@ function AccountToAccountChat() {
                   />
                 )}
                 {message.content && message.content.video && (
-                  <video controls className="max-w-xs lg:h-96 lg:w-72 md:h-96 md:w-64 h-40 w-32 text-4xl">
+                  <video
+                    controls
+                    className="max-w-xs lg:h-96 lg:w-72 md:h-96 md:w-64 h-40 w-32 text-4xl"
+                  >
                     <source src={message.content.video} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
@@ -464,7 +493,7 @@ function AccountToAccountChat() {
                     >
                       Forward
                     </button>
-                    {(message.content.image||message.content.camera) && (
+                    {(message.content.image || message.content.camera) && (
                       <button
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => handleEditImage(message)}
@@ -472,16 +501,14 @@ function AccountToAccountChat() {
                         Edit Image
                       </button>
                     )}
-                    {
-                      message.sender === loggedInUserId && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleDelete(message)}
-                        >
-                          delete
-                        </button>
-                      )
-                    }
+                    {message.sender === loggedInUserId && (
+                      <button
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => handleDelete(message)}
+                      >
+                        delete
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -489,7 +516,12 @@ function AccountToAccountChat() {
             <div ref={messagesEndRef} />
             {showCamera && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-                <Camera onCapture={handleCapture} onClose={handleCloseCamera} loggedInUserId={loggedInUserId} recipient={recipient} />
+                <Camera
+                  onCapture={handleCapture}
+                  onClose={handleCloseCamera}
+                  loggedInUserId={loggedInUserId}
+                  recipient={recipient}
+                />
               </div>
             )}
           </div>
@@ -519,15 +551,20 @@ function AccountToAccountChat() {
             >
               <IoMdSend />
             </button>
-            <AllUsersFileModel sender={loggedInUserId} recipient={recipient} senderName={userDetails.name} />
+            <AllUsersFileModel
+              sender={loggedInUserId}
+              recipient={recipient}
+              senderName={userDetails.name}
+            />
           </div>
-          <ScrollToBottomButton messagesEndRef={messagesEndRef}/>
+          <ScrollToBottomButton messagesEndRef={messagesEndRef} />
         </div>
       ) : (
         <div className="w-full lg:w-1/4 bg-white p-4 overflow-y-auto sticky lg:mt-20 border border-purple-100 top-0  z-10">
-          <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">All Accounts Employees</h1>
+          <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">
+            All Accounts Employees
+          </h1>
           <div className="relative flex items-center mb-4">
-
             <input
               type="text"
               value={userSearchQuery}
@@ -538,25 +575,28 @@ function AccountToAccountChat() {
             <AiOutlineSearch className="absolute top-3 left-3 text-gray-500 text-2xl" />
           </div>
           <ul>
-          {sortedUsers.map((user) => (
-      <li
-        key={user._id}
-        className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${unreadUsers.some((unreadUser) => unreadUser.userId === user._id)
-          ? "bg-blue-200"
-          : "bg-gray-200"
-        } ${recipient === user._id ? "bg-green-200" : ""}`}
-        onClick={() => handleClick(user._id, user.name)}
-      >
-        <span>{user.name}</span>
-        <span>
-          {user.unreadCount > 0 && (
-            <span className="text-red-500 font-bold">
-              {user.unreadCount}
-            </span>
-          )}
-        </span>
-      </li>
-    ))}
+            {sortedUsers.map((user) => (
+              <li
+                key={user._id}
+                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${
+                  unreadUsers.some(
+                    (unreadUser) => unreadUser.userId === user._id
+                  )
+                    ? "bg-blue-200"
+                    : "bg-gray-200"
+                } ${recipient === user._id ? "bg-green-200" : ""}`}
+                onClick={() => handleClick(user._id, user.name)}
+              >
+                <span>{user.name}</span>
+                <span>
+                  {user.unreadCount > 0 && (
+                    <span className="text-red-500 font-bold">
+                      {user.unreadCount}
+                    </span>
+                  )}
+                </span>
+              </li>
+            ))}
           </ul>
         </div>
       )}
@@ -575,8 +615,6 @@ function AccountToAccountChat() {
           recipient={recipient}
           isVisible={showReplyModal}
           onClose={() => setShowReplyModal(false)}
-
-
         />
       )}
       {showImageEditor && (
@@ -584,7 +622,6 @@ function AccountToAccountChat() {
           imageUrl={imageForEditing}
           handleModalClose={handleModalClose}
           recipient={recipient}
-
         />
       )}
     </div>

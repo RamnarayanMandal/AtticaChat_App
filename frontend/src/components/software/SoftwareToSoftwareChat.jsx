@@ -5,7 +5,7 @@ import { IoIosDocument } from "react-icons/io";
 import { BASE_URL } from "../../constants";
 import AllUsersFileModel from "../AllUsers/AllUsersFileModel";
 import UserSidebar from "../AllUsers/UserSidebar";
-import ForwardModalAllUsers from "../AllUsers/ForwardModalAllUsers"
+import ForwardModalAllUsers from "../AllUsers/ForwardModalAllUsers";
 import ReplyModel from "../ReplyModel";
 import { FaArrowLeft, FaCamera } from "react-icons/fa";
 import { IoMdSend } from "react-icons/io";
@@ -15,9 +15,7 @@ import EditModel from "../utility/EditModel";
 import ScrollToBottomButton from "../utility/ScrollToBottomButton";
 import { FaVideo } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-
-
-
+import GPSTracker from "../manager/Gps";
 
 function SoftwareToSoftware() {
   const [messages, setMessages] = useState([]);
@@ -41,10 +39,10 @@ function SoftwareToSoftware() {
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showImageEditor, setShowImageEditor] = useState(false);
-  const [imageForEditing, setImageForEditing] = useState('');
+  const [imageForEditing, setImageForEditing] = useState("");
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // const handleClick = (id, name) => {
   //   setSender(loggedInUserId);
@@ -54,19 +52,27 @@ function SoftwareToSoftware() {
   //   setShowChat(true);
   // };
 
- 
-  const [newCountMessage, setNewCountMessage] = useState(() => JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() => JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-  const [currentCountMessage, setCurrentCountMessage] = useState(() => JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
-
- 
- 
+  const [newCountMessage, setNewCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+  );
+  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() =>
+    JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+  );
+  const [currentCountMessage, setCurrentCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+  );
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLastUserMessageCounts(JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-      setNewCountMessage(JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-      setCurrentCountMessage(JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+      setLastUserMessageCounts(
+        JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+      );
+      setNewCountMessage(
+        JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+      );
+      setCurrentCountMessage(
+        JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+      );
     }, 1000); // Update every second
 
     return () => clearInterval(intervalId); // Clean up on component unmount
@@ -74,25 +80,36 @@ function SoftwareToSoftware() {
 
   const handleClick = (id, name) => {
     // Get the current count message and last user message counts from local storage
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
     // Update lastUserMessageCounts with currentCountMessage for the clicked user
     const updatedLastUserMessageCounts = lastUserMessageCounts.map((user) => {
       if (user.userId === id) {
-        return { userId: user.userId, count: currentCountMessage.find((u) => u.userId === id)?.count || 0 };
+        return {
+          userId: user.userId,
+          count: currentCountMessage.find((u) => u.userId === id)?.count || 0,
+        };
       }
       return user;
     });
 
     // If the user is not in lastUserMessageCounts, add them
     if (!updatedLastUserMessageCounts.some((user) => user.userId === id)) {
-      const currentCount = currentCountMessage.find((u) => u.userId === id)?.count || 0;
+      const currentCount =
+        currentCountMessage.find((u) => u.userId === id)?.count || 0;
       updatedLastUserMessageCounts.push({ userId: id, count: currentCount });
     }
 
     // Store the updated lastUserMessageCounts in local storage
-    localStorage.setItem("lastUserMessageCounts", JSON.stringify(updatedLastUserMessageCounts));
+    localStorage.setItem(
+      "lastUserMessageCounts",
+      JSON.stringify(updatedLastUserMessageCounts)
+    );
 
     // Set the state and fetch messages
     setSender(loggedInUserId);
@@ -104,25 +121,29 @@ function SoftwareToSoftware() {
 
   // Function to get the count for a user
   const getCountForUser = (userId) => {
-    const newCountMessage = JSON.parse(localStorage.getItem("newCountMessage") || "[]");
+    const newCountMessage = JSON.parse(
+      localStorage.getItem("newCountMessage") || "[]"
+    );
     const user = newCountMessage.find((item) => item.userId === userId);
     return user ? user.count : 0;
   };
 
   // Function to get the unread count for a user
   const getUnreadCountForUser = (userId) => {
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
-    const currentCount = currentCountMessage.find((user) => user.userId === userId)?.count || 0;
-    const lastCount = lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
+    const currentCount =
+      currentCountMessage.find((user) => user.userId === userId)?.count || 0;
+    const lastCount =
+      lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
 
     return currentCount - lastCount;
   };
-
-
-
-
 
   // const fetchMessages = (sender, recipient) => {
   //   axios
@@ -147,7 +168,10 @@ function SoftwareToSoftware() {
                 ? { ...user } // Do not update the lastMessageTime here
                 : user
             )
-            .sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime))
+            .sort(
+              (a, b) =>
+                new Date(b.lastMessageTime) - new Date(a.lastMessageTime)
+            )
         );
         console.log(response);
       })
@@ -155,9 +179,6 @@ function SoftwareToSoftware() {
         console.error(error);
       });
   };
-
-
-
 
   // useEffect(() => {
   //   axios
@@ -187,9 +208,11 @@ function SoftwareToSoftware() {
       });
   }, []);
 
-
   useEffect(() => {
-    const intervalId = setInterval(() => fetchMessages(sender, recipient), 2000);
+    const intervalId = setInterval(
+      () => fetchMessages(sender, recipient),
+      2000
+    );
     return () => clearInterval(intervalId);
   }, [sender, recipient]);
 
@@ -229,7 +252,9 @@ function SoftwareToSoftware() {
       senderName: userDetails.name,
       text: newMessage,
       image: attachment?.type.startsWith("image/") ? attachment.url : null,
-      document: attachment?.type.startsWith("application/") ? attachment.url : null,
+      document: attachment?.type.startsWith("application/")
+        ? attachment.url
+        : null,
       video: attachment?.type.startsWith("video/") ? attachment.url : null,
     };
 
@@ -248,7 +273,10 @@ function SoftwareToSoftware() {
                 ? { ...user, lastMessageTime: new Date() }
                 : user
             )
-            .sort((a, b) => new Date(b.lastMessageTime) - new Date(a.lastMessageTime))
+            .sort(
+              (a, b) =>
+                new Date(b.lastMessageTime) - new Date(a.lastMessageTime)
+            )
         );
       })
       .catch((error) => {
@@ -290,7 +318,6 @@ function SoftwareToSoftware() {
   //   }
   // }, [users]);
 
-
   useEffect(() => {
     if (users.length > 0) {
       const fetchUnreadMessages = async () => {
@@ -311,9 +338,6 @@ function SoftwareToSoftware() {
       fetchUnreadMessages();
     }
   }, [users]);
-
-
-
 
   const handleBackToEmployees = () => {
     setShowChat(false);
@@ -349,7 +373,6 @@ function SoftwareToSoftware() {
     setShowReplyModal(true);
   };
 
-
   const handleForward = (message) => {
     console.log(message);
     setForwardMessage(message);
@@ -358,7 +381,6 @@ function SoftwareToSoftware() {
   };
 
   const handleForwardMessage = () => {
-
     setShowForwardModal(false);
     setShowDropdown(null);
   };
@@ -377,12 +399,12 @@ function SoftwareToSoftware() {
   };
 
   const handleModalClose = () => {
-    setImageForEditing(''); // Close the modal and reset selected image
+    setImageForEditing(""); // Close the modal and reset selected image
     setShowImageEditor(false); // Close edit modal
   };
   const handleEditImage = (message) => {
     setShowImageEditor(true);
-    setImageForEditing((message.content.image || message.content.camera));
+    setImageForEditing(message.content.image || message.content.camera);
     // console.log("*******",imageForEditing)
   };
 
@@ -392,15 +414,12 @@ function SoftwareToSoftware() {
     );
   };
 
-
-
   const handleDelete = (message) => {
     axios
       .delete(`${BASE_URL}/api/delmessages/${message._id}`)
       .then((response) => {
-
         setMessages(messages.filter((m) => m._id !== message._id));
-        setShowDropdown("null")
+        setShowDropdown("null");
       })
 
       .catch((error) => {
@@ -408,24 +427,28 @@ function SoftwareToSoftware() {
       });
   };
   const sortedUsers = users
-  .filter((user) =>
-    user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
-  )
-  .map((user) => ({
-    ...user,
-    unreadCount: getUnreadCountForUser(user._id),
-  }))
-  .sort((a, b) => b.unreadCount - a.unreadCount);
-  
-  const handleVideoCall= ()=>{
-    navigate(`/videoCall/${recipient}`)
-  }
+    .filter((user) =>
+      user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
+    )
+    .map((user) => ({
+      ...user,
+      unreadCount: getUnreadCountForUser(user._id),
+    }))
+    .sort((a, b) => b.unreadCount - a.unreadCount);
+
+  const handleVideoCall = () => {
+    navigate(`/videoCall/${recipient}`);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden ">
+      <GPSTracker managerId={loggedInUserId} path={"te-location"} />
 
-     
-      {!showChat && <span className="mt-20"><ScrollingNavbar /></span>}
+      {!showChat && (
+        <span className="mt-20">
+          <ScrollingNavbar />
+        </span>
+      )}
       <UserSidebar value="SOFTWARE" />
 
       {showChat ? (
@@ -433,28 +456,26 @@ function SoftwareToSoftware() {
           <div className="flex items-center justify-between p-4 lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white sticky top-0 z-10 border border-[#5443c3]">
             <button
               onClick={handleBackToEmployees}
-             className="lg:text-2xl p-2 rounded-md lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white"
+              className="lg:text-2xl p-2 rounded-md lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white"
             >
-              <FaArrowLeft  />
+              <FaArrowLeft />
             </button>
 
             <h1 className="lg:text-2xl text-xl font-bold">{recipientName}</h1>
-            <FaVideo className="text-2xl" onClick={handleVideoCall}/>
-
+            <FaVideo className="text-2xl" onClick={handleVideoCall} />
           </div>
           <div className="flex-grow overflow-y-auto p-4 flex flex-col bg-[#eef2fa] h-screen pr-20">
             {messages.map((message, index) => (
               <div
                 key={message._id}
-                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap ${message.sender === loggedInUserId
-                  ? "self-end bg-[#9184e9] text-white border-2 border-[#5443c3] rounded-tr-3xl rounded-bl-3xl"
-                  : "self-start bg-[#ffffff] text-[#5443c3] border-2 border-[#5443c3] rounded-tl-3xl rounded-br-3xl"
-                  }`}
-
+                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap ${
+                  message.sender === loggedInUserId
+                    ? "self-end bg-[#9184e9] text-white border-2 border-[#5443c3] rounded-tr-3xl rounded-bl-3xl"
+                    : "self-start bg-[#ffffff] text-[#5443c3] border-2 border-[#5443c3] rounded-tl-3xl rounded-br-3xl"
+                }`}
                 onMouseEnter={() => handleHover(index)}
                 onMouseLeave={() => setHoveredMessage(null)}
               >
-
                 {message.content && message.content.originalMessage && (
                   <div className="mb-2">
                     <span className="bg-green-300 px-2 py-1 text-xs text-white rounded">
@@ -463,7 +484,9 @@ function SoftwareToSoftware() {
                   </div>
                 )}
                 {message.content && message.content.text && (
-                  <p className="font-bold lg:text-2xl text-sm">{message.content.text}</p>
+                  <p className="font-bold lg:text-2xl text-sm">
+                    {message.content.text}
+                  </p>
                 )}
                 {message.content && message.content.camera && (
                   <img
@@ -528,16 +551,14 @@ function SoftwareToSoftware() {
                         Edit Image
                       </button>
                     )}
-                    {
-                      message.sender === loggedInUserId && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleDelete(message)}
-                        >
-                          delete
-                        </button>
-                      )
-                    }
+                    {message.sender === loggedInUserId && (
+                      <button
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => handleDelete(message)}
+                      >
+                        delete
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -545,7 +566,12 @@ function SoftwareToSoftware() {
             <div ref={messagesEndRef} />
             {showCamera && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-                <Camera onCapture={handleCapture} onClose={handleCloseCamera} loggedInUserId={loggedInUserId} recipient={recipient} />
+                <Camera
+                  onCapture={handleCapture}
+                  onClose={handleCloseCamera}
+                  loggedInUserId={loggedInUserId}
+                  recipient={recipient}
+                />
               </div>
             )}
           </div>
@@ -575,15 +601,20 @@ function SoftwareToSoftware() {
             >
               <IoMdSend />
             </button>
-            <AllUsersFileModel sender={loggedInUserId} recipient={recipient} senderName={userDetails.name} />
+            <AllUsersFileModel
+              sender={loggedInUserId}
+              recipient={recipient}
+              senderName={userDetails.name}
+            />
           </div>
           <ScrollToBottomButton messagesEndRef={messagesEndRef} />
         </div>
       ) : (
         <div className="w-full lg:w-1/4 bg-white p-4 overflow-y-auto sticky lg:mt-20 border border-purple-100 top-0  z-10">
-          <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">All Software Employees</h1>
+          <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">
+            All Software Employees
+          </h1>
           <div className=" relative flex items-center mb-5">
-
             <input
               type="text"
               value={userSearchQuery}
@@ -594,33 +625,34 @@ function SoftwareToSoftware() {
             <AiOutlineSearch className="absolute top-3 left-3 text-gray-500 text-2xl" />
           </div>
           <ul>
-          {sortedUsers.map((user) => (
-      <li
-        key={user._id}
-        className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${unreadUsers.some((unreadUser) => unreadUser.userId === user._id)
-          ? "bg-blue-200"
-          : "bg-gray-200"
-        } ${recipient === user._id ? "bg-green-200" : ""}`}
-        onClick={() => handleClick(user._id, user.name)}
-      >
-        <span>{user.name}</span>
-        <span>
-          {user.unreadCount > 0 && (
-            <span className="text-red-500 font-bold">
-              {user.unreadCount}
-            </span>
-          )}
-        </span>
-      </li>
-    ))}
+            {sortedUsers.map((user) => (
+              <li
+                key={user._id}
+                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${
+                  unreadUsers.some(
+                    (unreadUser) => unreadUser.userId === user._id
+                  )
+                    ? "bg-blue-200"
+                    : "bg-gray-200"
+                } ${recipient === user._id ? "bg-green-200" : ""}`}
+                onClick={() => handleClick(user._id, user.name)}
+              >
+                <span>{user.name}</span>
+                <span>
+                  {user.unreadCount > 0 && (
+                    <span className="text-red-500 font-bold">
+                      {user.unreadCount}
+                    </span>
+                  )}
+                </span>
+              </li>
+            ))}
           </ul>
-
-
         </div>
       )}
 
       {showForwardModal && (
-        < ForwardModalAllUsers
+        <ForwardModalAllUsers
           users={users}
           forwardMessage={forwardMessage}
           onForward={handleForwardMessage}
@@ -636,7 +668,6 @@ function SoftwareToSoftware() {
           isVisible={showReplyModal}
           senderName={userDetails.name}
           onClose={() => setShowReplyModal(false)}
-
         />
       )}
       {showImageEditor && (
@@ -644,7 +675,6 @@ function SoftwareToSoftware() {
           imageUrl={imageForEditing}
           handleModalClose={handleModalClose}
           recipient={recipient}
-
         />
       )}
     </div>
@@ -652,20 +682,3 @@ function SoftwareToSoftware() {
 }
 
 export default SoftwareToSoftware;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

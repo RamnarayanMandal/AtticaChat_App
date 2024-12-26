@@ -2,33 +2,25 @@ const mongoose = require("mongoose");
 
 const employeeRegSchema = mongoose.Schema(
   {
-    // user_id:{
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   required:true,
-    //   ref:"User",
-    //  },
     name: {
       type: String,
-      required: [true, "Please add the user nam address"],
+      required: [true, "Please add the user name"],
     },
     password: {
       type: String,
       required: [true, "Please add the user password"],
     },
-
     confirmPassword: {
       type: String,
       required: [true, "Please add the user confirm password"],
     },
     employeeId: {
       type: String,
-      required: [true, "Please add the user employee code address"],
-      // unique:true
+      required: [true, "Please add the user employee code"],
+      unique: true,
     },
     state: {
       type: String,
-     
-      
     },
     language: {
       type: String,
@@ -42,20 +34,19 @@ const employeeRegSchema = mongoose.Schema(
         grade: {
           type: String,
         },
-      }
+      },
     ],
-    
     isActive: {
       type: Boolean,
       default: false,
     },
     access: {
       type: Boolean,
-      default: true, 
+      default: true,
     },
   },
   {
-    timestamp: true,
+    timestamps: true, // Enables createdAt and updatedAt fields
   }
 );
 

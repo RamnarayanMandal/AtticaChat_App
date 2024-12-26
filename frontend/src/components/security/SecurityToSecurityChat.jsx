@@ -5,16 +5,17 @@ import { IoIosDocument } from "react-icons/io";
 import { BASE_URL } from "../../constants";
 import AllUsersFileModel from "../AllUsers/AllUsersFileModel";
 import Sidebar from "../AllUsers/UserSidebar";
-import ForwardModalAllUsers from "../AllUsers/ForwardModalAllUsers"
-import ReplyModel from "../ReplyModel";//--------------->
+import ForwardModalAllUsers from "../AllUsers/ForwardModalAllUsers";
+import ReplyModel from "../ReplyModel"; //--------------->
 import { FaArrowLeft, FaCamera } from "react-icons/fa";
 import { IoMdSend } from "react-icons/io";
 import Camera from "../Camera/Camera";
-import ScrollingNavbar from "../admin/ScrollingNavbar";  
+import ScrollingNavbar from "../admin/ScrollingNavbar";
 import EditModel from "../utility/EditModel";
 import ScrollToBottomButton from "../utility/ScrollToBottomButton";
 import { FaVideo } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import GPSTracker from "../manager/Gps";
 
 function SecurityToSecurityChat() {
   const [messages, setMessages] = useState([]);
@@ -35,26 +36,36 @@ function SecurityToSecurityChat() {
   const [forwardMessage, setForwardMessage] = useState(null);
   const [showForwardModal, setShowForwardModal] = useState(false);
   const [replyMessage, setReplyMessage] = useState(null); //--------------->
-  const [showReplyModal, setShowReplyModal] = useState(false);  //--------
+  const [showReplyModal, setShowReplyModal] = useState(false); //--------
   const [showCamera, setShowCamera] = useState(false);
   const [showImageEditor, setShowImageEditor] = useState(false);
-  const [imageForEditing, setImageForEditing] = useState('');
-
+  const [imageForEditing, setImageForEditing] = useState("");
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
 
-  const [newCountMessage, setNewCountMessage] = useState(() => JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() => JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-  const [currentCountMessage, setCurrentCountMessage] = useState(() => JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+  const [newCountMessage, setNewCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+  );
+  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() =>
+    JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+  );
+  const [currentCountMessage, setCurrentCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+  );
 
-  const navigate = useNavigate()
- 
+  const navigate = useNavigate();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLastUserMessageCounts(JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-      setNewCountMessage(JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-      setCurrentCountMessage(JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+      setLastUserMessageCounts(
+        JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+      );
+      setNewCountMessage(
+        JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+      );
+      setCurrentCountMessage(
+        JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+      );
     }, 1000); // Update every second
 
     return () => clearInterval(intervalId); // Clean up on component unmount
@@ -62,25 +73,36 @@ function SecurityToSecurityChat() {
 
   const handleClick = (id, name) => {
     // Get the current count message and last user message counts from local storage
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
     // Update lastUserMessageCounts with currentCountMessage for the clicked user
     const updatedLastUserMessageCounts = lastUserMessageCounts.map((user) => {
       if (user.userId === id) {
-        return { userId: user.userId, count: currentCountMessage.find((u) => u.userId === id)?.count || 0 };
+        return {
+          userId: user.userId,
+          count: currentCountMessage.find((u) => u.userId === id)?.count || 0,
+        };
       }
       return user;
     });
 
     // If the user is not in lastUserMessageCounts, add them
     if (!updatedLastUserMessageCounts.some((user) => user.userId === id)) {
-      const currentCount = currentCountMessage.find((u) => u.userId === id)?.count || 0;
+      const currentCount =
+        currentCountMessage.find((u) => u.userId === id)?.count || 0;
       updatedLastUserMessageCounts.push({ userId: id, count: currentCount });
     }
 
     // Store the updated lastUserMessageCounts in local storage
-    localStorage.setItem("lastUserMessageCounts", JSON.stringify(updatedLastUserMessageCounts));
+    localStorage.setItem(
+      "lastUserMessageCounts",
+      JSON.stringify(updatedLastUserMessageCounts)
+    );
 
     // Set the state and fetch messages
     setSender(loggedInUserId);
@@ -92,18 +114,26 @@ function SecurityToSecurityChat() {
 
   // Function to get the count for a user
   const getCountForUser = (userId) => {
-    const newCountMessage = JSON.parse(localStorage.getItem("newCountMessage") || "[]");
+    const newCountMessage = JSON.parse(
+      localStorage.getItem("newCountMessage") || "[]"
+    );
     const user = newCountMessage.find((item) => item.userId === userId);
     return user ? user.count : 0;
   };
 
   // Function to get the unread count for a user
   const getUnreadCountForUser = (userId) => {
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
-    const currentCount = currentCountMessage.find((user) => user.userId === userId)?.count || 0;
-    const lastCount = lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
+    const currentCount =
+      currentCountMessage.find((user) => user.userId === userId)?.count || 0;
+    const lastCount =
+      lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
 
     return currentCount - lastCount;
   };
@@ -135,7 +165,10 @@ function SecurityToSecurityChat() {
   }, []);
 
   useEffect(() => {
-    const intervalId = setInterval(() => fetchMessages(sender, recipient), 2000);
+    const intervalId = setInterval(
+      () => fetchMessages(sender, recipient),
+      2000
+    );
     return () => clearInterval(intervalId);
   }, [sender, recipient]);
 
@@ -230,8 +263,8 @@ function SecurityToSecurityChat() {
   };
 
   const handleReply = (message) => {
-    setReplyMessage(message);  //--------------->
-    setShowReplyModal(true);   //--------------->
+    setReplyMessage(message); //--------------->
+    setShowReplyModal(true); //--------------->
   };
 
   const handleForward = (message) => {
@@ -242,7 +275,6 @@ function SecurityToSecurityChat() {
   };
 
   const handleForwardMessage = () => {
-
     setShowForwardModal(false);
     setShowDropdown(null);
   };
@@ -261,53 +293,55 @@ function SecurityToSecurityChat() {
   };
 
   const handleModalClose = () => {
-    setImageForEditing(''); // Close the modal and reset selected image
+    setImageForEditing(""); // Close the modal and reset selected image
     setShowImageEditor(false); // Close edit modal
   };
   const handleEditImage = (message) => {
     setShowImageEditor(true);
-    setImageForEditing((message.content.image || message.content.camera));
+    setImageForEditing(message.content.image || message.content.camera);
     // console.log("*******",imageForEditing)
   };
 
   const handleDelete = (message) => {
     axios
-     .delete(`${BASE_URL}/api/delmessages/${message._id}`)
-     .then((response) => {
-      
-        setMessages(messages.filter((m) => m._id!== message._id));
-        setShowDropdown("null")
+      .delete(`${BASE_URL}/api/delmessages/${message._id}`)
+      .then((response) => {
+        setMessages(messages.filter((m) => m._id !== message._id));
+        setShowDropdown("null");
       })
 
-     .catch((error) => {
+      .catch((error) => {
         console.error(error);
       });
   };
   const sortedUsers = users
-  .filter((user) =>
-    user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
-  )
-  .map((user) => ({
-    ...user,
-    unreadCount: getUnreadCountForUser(user._id),
-  }))
-  .sort((a, b) => b.unreadCount - a.unreadCount);
+    .filter((user) =>
+      user.name.toLowerCase().includes(userSearchQuery.toLowerCase())
+    )
+    .map((user) => ({
+      ...user,
+      unreadCount: getUnreadCountForUser(user._id),
+    }))
+    .sort((a, b) => b.unreadCount - a.unreadCount);
 
   const handleVideoCall = () => {
-    navigate(`/videoCall/${recipient}`)
-  }
+    navigate(`/videoCall/${recipient}`);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden ">
-     
-    
-      {!showChat && <span className="mt-20"><ScrollingNavbar  /></span>}
+      <GPSTracker managerId={loggedInUserId} path={"te-location"} />
+
+      {!showChat && (
+        <span className="mt-20">
+          <ScrollingNavbar />
+        </span>
+      )}
       <Sidebar value="SECURITY" />
 
       {showChat ? (
         <div className="w-full mb-20 lg:mb-0 flex flex-col justify-between overflow-hidden">
           <div className="flex items-center justify-between p-4 lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white sticky top-0 z-10 border border-[#5443c3]">
-
             <button
               onClick={handleBackToEmployees}
               className="lg:text-2xl p-2 rounded-md lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white"
@@ -316,18 +350,17 @@ function SecurityToSecurityChat() {
             </button>
 
             <h1 className="lg:text-2xl text-xl font-bold">{recipientName}</h1>
-            <FaVideo className="text-2xl" onClick={handleVideoCall}/>
-
+            <FaVideo className="text-2xl" onClick={handleVideoCall} />
           </div>
           <div className="flex-grow overflow-y-auto p-4 flex flex-col bg-[#eef2fa] mb-20 lg:mb-0 h-screen">
             {messages.map((message, index) => (
               <div
                 key={message._id}
-                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap ${message.sender === loggedInUserId
+                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap ${
+                  message.sender === loggedInUserId
                     ? " self-end bg-[#9184e9] text-white border-2 border-[#5443c3] rounded-tr-3xl rounded-bl-3xl"
                     : "self-start bg-[#ffffff] text-[#5443c3] border-2 border-[#5443c3] rounded-tl-3xl rounded-br-3xl"
-                  }`}
-
+                }`}
                 onMouseEnter={() => handleHover(index)}
                 onMouseLeave={() => setHoveredMessage(null)}
               >
@@ -340,8 +373,8 @@ function SecurityToSecurityChat() {
                 )}
                 {message.content && message.content.text && (
                   <p className="font-bold lg:text-base text-xs">
-
-                    {message.content.text}</p>
+                    {message.content.text}
+                  </p>
                 )}
                 {message.content && message.content.image && (
                   <img
@@ -384,46 +417,49 @@ function SecurityToSecurityChat() {
                   />
                 )}
 
-{showDropdown === index && (
-                    <div className="absolute top-8 right-2 bg-white border rounded shadow-lg z-10">
+                {showDropdown === index && (
+                  <div className="absolute top-8 right-2 bg-white border rounded shadow-lg z-10">
+                    <button
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => handleReply(message)}
+                    >
+                      Reply
+                    </button>
+                    <button
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => handleForward(message)}
+                    >
+                      Forward
+                    </button>
+                    {(message.content.image || message.content.camera) && (
                       <button
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => handleReply(message)}
+                        onClick={() => handleEditImage(message)}
                       >
-                        Reply
+                        Edit Image
                       </button>
+                    )}
+                    {message.sender === loggedInUserId && (
                       <button
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => handleForward(message)}
+                        onClick={() => handleDelete(message)}
                       >
-                        Forward
+                        delete
                       </button>
-                      {(message.content.image || message.content.camera) && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleEditImage(message)}
-                        >
-                          Edit Image
-                        </button>
-                      )}
-                      {
-                      message.sender === loggedInUserId && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleDelete(message)}
-                        >
-                          delete
-                        </button>
-                      )
-                    }
-                    </div>
-                  )}
+                    )}
+                  </div>
+                )}
               </div>
             ))}
             <div ref={messagesEndRef} />
             {showCamera && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-                <Camera onCapture={handleCapture} onClose={handleCloseCamera} loggedInUserId={loggedInUserId} recipient={recipient} />
+                <Camera
+                  onCapture={handleCapture}
+                  onClose={handleCloseCamera}
+                  loggedInUserId={loggedInUserId}
+                  recipient={recipient}
+                />
               </div>
             )}
           </div>
@@ -454,15 +490,20 @@ function SecurityToSecurityChat() {
             >
               <IoMdSend />
             </button>
-            <AllUsersFileModel sender={loggedInUserId} recipient={recipient} senderName={userDetails.name} />
+            <AllUsersFileModel
+              sender={loggedInUserId}
+              recipient={recipient}
+              senderName={userDetails.name}
+            />
           </div>
-          <ScrollToBottomButton messagesEndRef={messagesEndRef}/>
+          <ScrollToBottomButton messagesEndRef={messagesEndRef} />
         </div>
       ) : (
         <div className="w-full lg:w-1/4 bg-white p-4 overflow-y-auto sticky lg:mt-20 border border-purple-100 top-0  z-10">
-          <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">All Security Employees</h1>
+          <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">
+            All Security Employees
+          </h1>
           <div className="relative flex items-center mb-5">
-
             <input
               type="text"
               value={userSearchQuery}
@@ -476,10 +517,13 @@ function SecurityToSecurityChat() {
             {sortedUsers.map((user) => (
               <li
                 key={user._id}
-                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${unreadUsers.some((unreadUser) => unreadUser.userId === user._id)
-                  ? "bg-blue-200"
-                  : "bg-gray-200"
-                  } ${recipient === user._id ? "bg-green-200" : ""}`}
+                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${
+                  unreadUsers.some(
+                    (unreadUser) => unreadUser.userId === user._id
+                  )
+                    ? "bg-blue-200"
+                    : "bg-gray-200"
+                } ${recipient === user._id ? "bg-green-200" : ""}`}
                 onClick={() => handleClick(user._id, user.name)}
               >
                 <span>{user.name}</span>
@@ -493,12 +537,10 @@ function SecurityToSecurityChat() {
               </li>
             ))}
           </ul>
-
-
         </div>
       )}
       {showForwardModal && (
-        < ForwardModalAllUsers
+        <ForwardModalAllUsers
           users={users}
           forwardMessage={forwardMessage}
           onForward={handleForwardMessage}
@@ -515,7 +557,6 @@ function SecurityToSecurityChat() {
           onClose={() => setShowReplyModal(false)}
           value={"Security"}
           senderName={userDetails.name}
-
         />
       )}
       {showImageEditor && (
@@ -523,7 +564,6 @@ function SecurityToSecurityChat() {
           imageUrl={imageForEditing}
           handleModalClose={handleModalClose}
           recipient={recipient}
-          
         />
       )}
     </div>

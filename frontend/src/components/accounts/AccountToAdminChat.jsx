@@ -11,16 +11,17 @@ import { BASE_URL } from "../../constants";
 import { FaArrowLeft } from "react-icons/fa";
 import ForwardMsgAllUsersToAdmin from "../AllUsers/ForwardMsgAllUsersToAdmin";
 import { IoMdSend } from "react-icons/io";
-import Sidebar from "../AllUsers/UserSidebar"
-import ReplyModel from "../ReplyModel";//--------------->
+import Sidebar from "../AllUsers/UserSidebar";
+import ReplyModel from "../ReplyModel"; //--------------->
 import AllUsersFileModel from "../AllUsers/AllUsersFileModel";
 import Camera from "../Camera/Camera";
-import EditImageModal from '../AllUsers/EditImageModal';
+import EditImageModal from "../AllUsers/EditImageModal";
 import EditModel from "../utility/EditModel";
 import ScrollToBottomButton from "../utility/ScrollToBottomButton";
 import ScrollingNavbar from "../admin/ScrollingNavbar";
 import { FaVideo } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
+import GPSTracker from "../manager/Gps";
 
 function AccountToAdminChat() {
   const [messages, setMessages] = useState([]);
@@ -44,53 +45,75 @@ function AccountToAdminChat() {
   const [showForwardModal, setShowForwardModal] = useState(false);
   const [hoveredMessage, setHoveredMessage] = useState(null);
   const [replyMessage, setReplyMessage] = useState(null); //--------------->
-  const [showReplyModal, setShowReplyModal] = useState(false);  //--------------->
+  const [showReplyModal, setShowReplyModal] = useState(false); //--------------->
   const [isChatSelected, setIsChatSelected] = useState(false);
   const [selectedChatUserId, setSelectedChatUserId] = useState("");
   const [showCamera, setShowCamera] = useState(false);
   const [showImageEditor, setShowImageEditor] = useState(false);
-  const [imageForEditing, setImageForEditing] = useState('');
+  const [imageForEditing, setImageForEditing] = useState("");
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-
-  const [newAdminCountMessage, setNewAdminCountMessage] = useState(() => JSON.parse(localStorage.getItem("newAdminCountMessage") || "[]"));
-  const [lastAdminMessageCounts, setLastAdminMessageCounts] = useState(() => JSON.parse(localStorage.getItem("lastAdminMessageCounts") || "[]"));
-  const [currentAdminCountMessage, setCurrentAdminCountMessage] = useState(() => JSON.parse(localStorage.getItem("currentAdminCountMessage") || "[]"));
-
+  const [newAdminCountMessage, setNewAdminCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("newAdminCountMessage") || "[]")
+  );
+  const [lastAdminMessageCounts, setLastAdminMessageCounts] = useState(() =>
+    JSON.parse(localStorage.getItem("lastAdminMessageCounts") || "[]")
+  );
+  const [currentAdminCountMessage, setCurrentAdminCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("currentAdminCountMessage") || "[]")
+  );
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLastAdminMessageCounts(JSON.parse(localStorage.getItem("lastAdminMessageCounts") || "[]"));
-      setNewAdminCountMessage(JSON.parse(localStorage.getItem("newAdminCountMessage") || "[]"));
-      setCurrentAdminCountMessage(JSON.parse(localStorage.getItem("currentAdminCountMessage") || "[]"));
+      setLastAdminMessageCounts(
+        JSON.parse(localStorage.getItem("lastAdminMessageCounts") || "[]")
+      );
+      setNewAdminCountMessage(
+        JSON.parse(localStorage.getItem("newAdminCountMessage") || "[]")
+      );
+      setCurrentAdminCountMessage(
+        JSON.parse(localStorage.getItem("currentAdminCountMessage") || "[]")
+      );
     }, 1000); // Update every second
 
     return () => clearInterval(intervalId); // Clean up on component unmount
   }, []);
 
-
-
   const handleAdminClick = (id, name) => {
-    console.log("hi................")
-    console.log("id, name ", id, name)
-    const currentAdminCountMessage = JSON.parse(localStorage.getItem("currentAdminCountMessage") || "[]");
-    const lastAdminMessageCounts = JSON.parse(localStorage.getItem("lastAdminMessageCounts") || "[]");
+    console.log("hi................");
+    console.log("id, name ", id, name);
+    const currentAdminCountMessage = JSON.parse(
+      localStorage.getItem("currentAdminCountMessage") || "[]"
+    );
+    const lastAdminMessageCounts = JSON.parse(
+      localStorage.getItem("lastAdminMessageCounts") || "[]"
+    );
 
-    const updatedLastAdminMessageCounts = lastAdminMessageCounts.map((admin) => {
-      if (admin.userId === id) {
-        return { userId: admin.userId, count: currentAdminCountMessage.find((u) => u.userId === id)?.count || 0 };
+    const updatedLastAdminMessageCounts = lastAdminMessageCounts.map(
+      (admin) => {
+        if (admin.userId === id) {
+          return {
+            userId: admin.userId,
+            count:
+              currentAdminCountMessage.find((u) => u.userId === id)?.count || 0,
+          };
+        }
+        return admin;
       }
-      return admin;
-    });
+    );
 
     if (!updatedLastAdminMessageCounts.some((admin) => admin.userId === id)) {
-      const currentCount = currentAdminCountMessage.find((u) => u.userId === id)?.count || 0;
+      const currentCount =
+        currentAdminCountMessage.find((u) => u.userId === id)?.count || 0;
       updatedLastAdminMessageCounts.push({ userId: id, count: currentCount });
     }
 
-    localStorage.setItem("lastAdminMessageCounts", JSON.stringify(updatedLastAdminMessageCounts));
+    localStorage.setItem(
+      "lastAdminMessageCounts",
+      JSON.stringify(updatedLastAdminMessageCounts)
+    );
     setLastAdminMessageCounts(updatedLastAdminMessageCounts);
     setRecipient(id);
     setRecipientName(name);
@@ -100,22 +123,29 @@ function AccountToAdminChat() {
   };
 
   const getUnreadCountForAdmin = (adminId) => {
+    const currentAdminCountMessage = JSON.parse(
+      localStorage.getItem("currentAdminCountMessage") || "[]"
+    );
+    const lastAdminMessageCounts = JSON.parse(
+      localStorage.getItem("lastAdminMessageCounts") || "[]"
+    );
 
-    const currentAdminCountMessage = JSON.parse(localStorage.getItem("currentAdminCountMessage") || "[]");
-    const lastAdminMessageCounts = JSON.parse(localStorage.getItem("lastAdminMessageCounts") || "[]");
-
-    const currentCount = currentAdminCountMessage.find((admin) => admin.userId === adminId)?.count || 0;
-    const lastCount = lastAdminMessageCounts.find((admin) => admin.userId === adminId)?.count || 0;
-    console.log("currentCount - lastCount  ", currentCount - lastCount)
+    const currentCount =
+      currentAdminCountMessage.find((admin) => admin.userId === adminId)
+        ?.count || 0;
+    const lastCount =
+      lastAdminMessageCounts.find((admin) => admin.userId === adminId)?.count ||
+      0;
+    console.log("currentCount - lastCount  ", currentCount - lastCount);
     return currentCount - lastCount;
   };
-
-
 
   // Function to fetch messages between two users
   const fetchMessages = (sender, recipient) => {
     axios
-      .get(`${BASE_URL}/api/empadminsender/getadminmessages/${recipient}/${sender}`)
+      .get(
+        `${BASE_URL}/api/empadminsender/getadminmessages/${recipient}/${sender}`
+      )
       .then((response) => {
         setMessages(response.data);
       })
@@ -141,13 +171,14 @@ function AccountToAdminChat() {
 
   // Fetch initial messages between logged-in user and selected recipient
   useEffect(() => {
-    const intervalId = setInterval(() => fetchMessages(loggedInUserId, recipient), 2000);
+    const intervalId = setInterval(
+      () => fetchMessages(loggedInUserId, recipient),
+      2000
+    );
     return () => clearInterval(intervalId);
   }, [recipient]);
 
-
   // Automatically scroll to bottom when new messages are received
-
 
   // Function to send a new message
   const handleSendMessage = () => {
@@ -259,8 +290,6 @@ function AccountToAdminChat() {
     }));
   };
 
-
-
   const handleHover = (index) => {
     setHoveredMessage(index);
   };
@@ -274,8 +303,8 @@ function AccountToAdminChat() {
   };
 
   const handleReply = (message) => {
-    setReplyMessage(message);  //--------------->
-    setShowReplyModal(true);   //--------------->
+    setReplyMessage(message); //--------------->
+    setShowReplyModal(true); //--------------->
   };
 
   const handleForward = (message) => {
@@ -297,7 +326,6 @@ function AccountToAdminChat() {
     setShowDropdown(null);
   };
 
-
   const handleBackToUserList = () => {
     setIsChatSelected(false);
     setSelectedChatUserId("");
@@ -316,12 +344,12 @@ function AccountToAdminChat() {
   };
 
   const handleModalClose = () => {
-    setImageForEditing(''); // Close the modal and reset selected image
+    setImageForEditing(""); // Close the modal and reset selected image
     setShowImageEditor(false); // Close edit modal
   };
   const handleEditImage = (message) => {
     setShowImageEditor(true);
-    setImageForEditing((message.content.image || message.content.camera));
+    setImageForEditing(message.content.image || message.content.camera);
     // console.log("*******",imageForEditing)
   };
 
@@ -329,9 +357,8 @@ function AccountToAdminChat() {
     axios
       .delete(`${BASE_URL}/api/empadminsender/delmessages/${message._id}`)
       .then((response) => {
-
         setMessages(messages.filter((m) => m._id !== message._id));
-        setShowDropdown("null")
+        setShowDropdown("null");
       })
 
       .catch((error) => {
@@ -346,16 +373,23 @@ function AccountToAdminChat() {
     .sort((a, b) => b.unreadCount - a.unreadCount);
 
   const handleVideoCall = () => {
-    navigate(`/videoCall/${recipient}`)
-  }
+    navigate(`/videoCall/${recipient}`);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden relative mt-20 lg:mt-0">
+      <GPSTracker managerId={loggedInUserId} path={"te-location"} />
       <ScrollingNavbar />
       <Sidebar value="ACCOUNT" />
 
-      <div className={`sticky top-0 bg-white  z-10 w-full lg:w-1/4 p-4 overflow-y-auto  lg:mt-20 border border-purple-100 flex flex-col  text-black shadow  ${isChatSelected ? 'hidden lg:flex' : 'flex'}`}>
-        <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">All Admins</h1>
+      <div
+        className={`sticky top-0 bg-white  z-10 w-full lg:w-1/4 p-4 overflow-y-auto  lg:mt-20 border border-purple-100 flex flex-col  text-black shadow  ${
+          isChatSelected ? "hidden lg:flex" : "flex"
+        }`}
+      >
+        <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">
+          All Admins
+        </h1>
         <div className="relative flex items-center mb-5">
           <input
             type="text"
@@ -367,7 +401,6 @@ function AccountToAdminChat() {
           <AiOutlineSearch className="absolute top-3 left-3 text-gray-500 text-2xl" />
         </div>
 
-
         <div className="h-screen overflow-y-auto">
           {sortedAdmins.map((admin) => (
             <div key={admin._id}>
@@ -377,9 +410,7 @@ function AccountToAdminChat() {
               >
                 <h1>{admin.email}</h1>
                 {admin.unreadCount > 0 && (
-                  <p className="text-red-500 font-bold">
-                    {admin.unreadCount}
-                  </p>
+                  <p className="text-red-500 font-bold">{admin.unreadCount}</p>
                 )}
               </div>
             </div>
@@ -387,22 +418,16 @@ function AccountToAdminChat() {
         </div>
       </div>
 
-
-
-
       {isChatSelected && (
         <div className="w-full h-screen lg:w-4/5 flex flex-col justify-between bg-[#f6f5fb]">
-
           {isChatSelected && (
             <div className="text-[#5443c3] sm:text-white sm:bg-[#5443c3] md:text-white md:bg-[#5443c3] h-12 bg-white p-2 flex flex-row justify-between border border-[#5443c3] lg:mt-20">
-
               <button
                 className="text-[#5443c3] sm:text-white md:text-white lg:text-2xl text-lg mt-2"
                 onClick={handleBackToUserList}
               >
                 <FaArrowLeft />
               </button>
-
 
               <h1 className="lg:text-2xl text-base font-bold flex-grow text-center">
                 Chat with {recipientName}
@@ -419,21 +444,29 @@ function AccountToAdminChat() {
                 {/* <BiLogOut /> */}
               </Link>
             </div>
-
           )}
 
-
-          <div className="flex flex-col flex-1  pt-4 relative overflow-y-auto pr-20" style={{ maxHeight: "80vh" }}>
+          <div
+            className="flex flex-col flex-1  pt-4 relative overflow-y-auto pr-20"
+            style={{ maxHeight: "80vh" }}
+          >
             {messages.map((message, index) => (
               <div
                 key={index}
-                className={`flex  relative break-words whitespace-pre-wrap ${message.sender === loggedInUserId ? 'justify-end' : 'justify-start'} mb-2  `}
+                className={`flex  relative break-words whitespace-pre-wrap ${
+                  message.sender === loggedInUserId
+                    ? "justify-end"
+                    : "justify-start"
+                } mb-2  `}
                 onMouseEnter={() => handleHover(index)}
                 onMouseLeave={() => handleLeave()}
               >
                 <div
-                  className={`relative lg:text-3xl md:text-xl text-sm font-bold ${message.sender === loggedInUserId ? " bg-[#e1dff3] border border-[#5443c3] text-[#5443c3] self-end rounded-tr-3xl rounded-bl-3xl " : "bg-white text-[#5443c3] border border-[#5443c3]  self-start rounded-tl-3xl rounded-br-3xl relative"
-                    } py-2 px-4 rounded-lg lg:max-w-2xl max-w-[50%]`}
+                  className={`relative lg:text-3xl md:text-xl text-sm font-bold ${
+                    message.sender === loggedInUserId
+                      ? " bg-[#e1dff3] border border-[#5443c3] text-[#5443c3] self-end rounded-tr-3xl rounded-bl-3xl "
+                      : "bg-white text-[#5443c3] border border-[#5443c3]  self-start rounded-tl-3xl rounded-br-3xl relative"
+                  } py-2 px-4 rounded-lg lg:max-w-2xl max-w-[50%]`}
                 >
                   {/* //---------------> */}
                   {message.content && message.content.originalMessage && (
@@ -449,7 +482,11 @@ function AccountToAdminChat() {
                   )}
                   {message.content && message.content.image && (
                     <>
-                      <img src={message.content.image} alt="Image" className="rounded-lg lg:h-96 lg:w-72 md:h-96 md:w-64 h-40 w-32" />
+                      <img
+                        src={message.content.image}
+                        alt="Image"
+                        className="rounded-lg lg:h-96 lg:w-72 md:h-96 md:w-64 h-40 w-32"
+                      />
                     </>
                   )}
                   {message.content && message.content.camera && (
@@ -470,7 +507,10 @@ function AccountToAdminChat() {
                     </a>
                   )}
                   {message.content && message.content.video && (
-                    <video controls className="max-w-xs text-orange-600 hover:underline">
+                    <video
+                      controls
+                      className="max-w-xs text-orange-600 hover:underline"
+                    >
                       <source src={message.content.video} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
@@ -478,8 +518,7 @@ function AccountToAdminChat() {
                   <span className="text-xs font-medium text-gray-500">
                     {new Date(message.createdAt).toLocaleString()}
                   </span>
-                  {
-                    hoveredMessage === index &&
+                  {hoveredMessage === index && (
                     <>
                       <AiOutlineDown
                         className="absolute top-2 right-2 cursor-pointer"
@@ -499,7 +538,8 @@ function AccountToAdminChat() {
                           >
                             Forward
                           </button>
-                          {(message.content.image || message.content.camera) && (
+                          {(message.content.image ||
+                            message.content.camera) && (
                             <button
                               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                               onClick={() => handleEditImage(message)}
@@ -507,27 +547,31 @@ function AccountToAdminChat() {
                               Edit Image
                             </button>
                           )}
-                          {
-                            message.sender === loggedInUserId && (
-                              <button
-                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                onClick={() => handleDelete(message)}
-                              >
-                                delete
-                              </button>
-                            )
-                          }
+                          {message.sender === loggedInUserId && (
+                            <button
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                              onClick={() => handleDelete(message)}
+                            >
+                              delete
+                            </button>
+                          )}
                         </div>
                       )}
                     </>
-                  }
+                  )}
                 </div>
               </div>
             ))}
             <div ref={messagesEndRef} />
             {showCamera && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-                <Camera onCapture={handleCapture} onClose={handleCloseCamera} loggedInUserId={loggedInUserId} recipient={recipient} admin={"admin"} />
+                <Camera
+                  onCapture={handleCapture}
+                  onClose={handleCloseCamera}
+                  loggedInUserId={loggedInUserId}
+                  recipient={recipient}
+                  admin={"admin"}
+                />
               </div>
             )}
           </div>
@@ -558,17 +602,17 @@ function AccountToAdminChat() {
             >
               <IoMdSend />
             </button>
-            <AllUsersFileModel sender={loggedInUserId} recipient={recipient} admin={"admin"} senderName={userDetails.name} />
+            <AllUsersFileModel
+              sender={loggedInUserId}
+              recipient={recipient}
+              admin={"admin"}
+              senderName={userDetails.name}
+            />
           </div>
           <ScrollToBottomButton messagesEndRef={messagesEndRef} />
         </div>
-
-
-      )
-
-      }
+      )}
       {showForwardModal && (
-
         <ForwardMsgAllUsersToAdmin
           users={admins}
           forwardMessage={forwardMessage}
@@ -584,7 +628,6 @@ function AccountToAdminChat() {
           isVisible={showReplyModal}
           onClose={() => setShowReplyModal(false)}
           value={"Admin"}
-
         />
       )}
       {showImageEditor && (
@@ -592,7 +635,7 @@ function AccountToAdminChat() {
           imageUrl={imageForEditing}
           handleModalClose={handleModalClose}
           recipient={recipient}
-          admin='admin'
+          admin="admin"
         />
       )}
     </div>
@@ -600,7 +643,3 @@ function AccountToAdminChat() {
 }
 
 export default AccountToAdminChat;
-
-
-
-

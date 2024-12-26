@@ -93,7 +93,6 @@ import AudioCallIng from "./videoCall/AudioCallIng.jsx";
 const App = () => {
   const isSuperAdminLoggedIn = localStorage.getItem("login");
   return (
-   
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<FirstPage />} />
@@ -117,8 +116,6 @@ const App = () => {
         />
         <Route path="/AccountsReg/:role" element={<AccountsReg />} />
 
-
-
         {/* <Route path="/adminRegistration" element={<AdminRegistration/>}/> */}
         <Route element={<AuthRequired />}>
           <Route path="/chat" element={<ChatPage />} />
@@ -137,7 +134,6 @@ const App = () => {
           <Route
             path="/BillingTeamManagerLogin"
             element={<BillingTeamManagerLogin />}
-
           />
           <Route path="/ManagerGroupchat" element={<ManagerGroupChat />} />
           <Route path="/BillingTeamChat" element={<BillingTeamChat />} />
@@ -191,8 +187,7 @@ const App = () => {
           <Route path="/AccountToAdminChat" element={<AccountToAdminChat />} />
 
           <Route path="/te" element={<TElogin />} />
-  
-          
+
           <Route path="/TEChat" element={<TEChat />} />
           <Route path="/techattoadmin" element={<TEChatToAdmin />} />
 
@@ -205,18 +200,24 @@ const App = () => {
             path="/SoftwareToAdminChat"
             element={<SoftwareToAdminChat />}
           />
-          <Route
-            path="/groupChat/:department"
-            element={<GroupChat />}
-          />
+          <Route path="/groupChat/:department" element={<GroupChat />} />
           <Route path="/billingGroup" element={<BillingGroupHome />} />
           <Route path="/SecurityChat" element={<SecurityToSecurityChat />} />
           <Route path="/SecurityToAdminChat" element={<SecurityToAdmin />} />
           <Route path="/Sidebar" element={<Sidebar />} />
 
-          <Route path="/announcement/:department" element={<AnnouncementByAdmin />} />
-          <Route path="/announcement/" element={<DepartmentAdminAnnouncement />} />
-          <Route path="/fetchAllAnnouncement/:route/:department" element={<FetchAllAnnouncement />} />
+          <Route
+            path="/announcement/:department"
+            element={<AnnouncementByAdmin />}
+          />
+          <Route
+            path="/announcement/"
+            element={<DepartmentAdminAnnouncement />}
+          />
+          <Route
+            path="/fetchAllAnnouncement/:route/:department"
+            element={<FetchAllAnnouncement />}
+          />
 
           <Route path="/LogisticLogin" element={<LogisticLogin />} />
           <Route path="/LogisticChat" element={<LogisticChat />} />
@@ -224,16 +225,15 @@ const App = () => {
 
           <Route path="/CashierLogin" element={<CashierLogin />} />
           <Route path="/CashierManagerChat" element={<CashierManagerChat />} />
-          <Route path="/videoCall/:id" element={<VideoCallIng  />} />
+          <Route path="/videoCall/:id" element={<VideoCallIng />} />
           <Route path="/AudioCallIng/:id" element={<AudioCallIng />} />
-      
-        
-
-
 
           {isSuperAdminLoggedIn ? (
             <>
-              <Route path="/superAdminDashboard" element={<SuperAdminDashboard/>} />
+              <Route
+                path="/superAdminDashboard"
+                element={<SuperAdminDashboard />}
+              />
               <Route
                 path="/superAdminGroups"
                 element={<SuperAdminGroupList />}
@@ -262,15 +262,11 @@ const App = () => {
       </Routes>
       {/* <Notification/> */}
       {/* <PopNotification/> */}
-       {/* <FetchApiComponent/>  */}
-       <VideoNotification/>
+      {/* <FetchApiComponent/>  */}
+      <VideoNotification />
       <GroupNotification />
       <GlobalNotification />
-
-    
     </BrowserRouter>
-    
-    
   );
 };
 export default App;

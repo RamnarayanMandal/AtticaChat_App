@@ -14,6 +14,7 @@ const registerEmployee = asyncHandler(async (req, res) => {
     employeeId,
     state,
     language,
+    grade,
     group,
   } = req.body;
 
@@ -23,29 +24,22 @@ const registerEmployee = asyncHandler(async (req, res) => {
       .json({ error: "Password and confirm password do not match!" });
   }
 
-  // Validate other mandatory fields
-  if (
-    !name ||
-    !password ||
-    !confirmPassword ||
-    !employeeId ||
-    !state ||
-    !grade ||
-    !group
-  ) {
-    return res.status(400).json({ error: "All fields are mandatoryyy!" });
-  }
-
-  // let user_id;
-  // if (req.userAdministrator) {
-  //   user_id = req.userAdministrator.id;
-  // } else {
-  //   return res.status(401).json({ error: "User not authenticated" });
-  // }
-
   const employeeAvailable = await EmployeReg.findOne({ employeeId });
   if (employeeAvailable) {
     return res.status(400).json({ error: "User already registered!" });
+  }
+
+  // Validate and format the `group` field
+  let formattedGroup = [];
+  if (group && typeof group === "string") {
+    // If `group` is a string, convert it to an array of objects
+    formattedGroup = [{ name: group, grade: "" }];
+  } else if (Array.isArray(group)) {
+    // If `group` is an array, ensure each element is an object
+    formattedGroup = group.map((g) => ({
+      name: g.name || "",
+      grade: g.grade || "",
+    }));
   }
 
   // Hash password
@@ -59,7 +53,7 @@ const registerEmployee = asyncHandler(async (req, res) => {
     state,
     language,
     grade,
-    group,
+    group: formattedGroup, // Use the validated and formatted group
   });
   console.log(employeeRegistration);
 
@@ -269,29 +263,25 @@ const deleteAllEmp = async (req, res) => {
   }
 };
 
-
 const getEmployeeGroups = async (req, res) => {
   try {
     const { userId } = req.params; // Extract userId from request parameters
 
     // Fetch employee data based on userId
-    const employee = await EmployeReg.findOne({ '_id': userId }).exec();
+    const employee = await EmployeReg.findOne({ _id: userId }).exec();
 
     // Check if employee exists
     if (!employee) {
-      return res.status(404).json({ message: 'Employee not found' });
+      return res.status(404).json({ message: "Employee not found" });
     }
 
     // Send the groups data as a response
     res.status(200).json(employee.group);
   } catch (error) {
-    console.error('Error fetching employee groups:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error fetching employee groups:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
-
-
-
 
 module.exports = {
   registerEmployee,
@@ -307,5 +297,5 @@ module.exports = {
   BolockAllEmployee,
   Unblocked,
   deleteAllEmp,
-  getEmployeeGroups
+  getEmployeeGroups,
 };

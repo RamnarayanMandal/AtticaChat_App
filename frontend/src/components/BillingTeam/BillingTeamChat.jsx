@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { AiOutlineSearch, AiOutlineDown } from "react-icons/ai";
@@ -16,12 +15,13 @@ import { IoMdSend } from "react-icons/io";
 import { BiLogOut } from "react-icons/bi";
 import { Link, useNavigate } from "react-router-dom";
 import { IoMdNotificationsOutline } from "react-icons/io";
-import fetchAnnounce from '../utility/fetchAnnounce';
+import fetchAnnounce from "../utility/fetchAnnounce";
 import Camera from "../Camera/Camera";
-import ScrollingNavbar from "../admin/ScrollingNavbar";  
+import ScrollingNavbar from "../admin/ScrollingNavbar";
 import EditModel from "../utility/EditModel";
 import ScrollToBottomButton from "../utility/ScrollToBottomButton";
 import BillingSidebar from "./BillingSidebar";
+import GPSTracker from "../manager/Gps";
 
 function BillingTeamChat() {
   const [messages, setMessages] = useState([]);
@@ -45,25 +45,34 @@ function BillingTeamChat() {
   const [replyMessage, setReplyMessage] = useState(null);
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
-  const [announcements, setAnnouncements] = useState([])
+  const [announcements, setAnnouncements] = useState([]);
   const navigate = useNavigate();
   const [showImageEditor, setShowImageEditor] = useState(false);
-  const [imageForEditing, setImageForEditing] = useState('');
+  const [imageForEditing, setImageForEditing] = useState("");
 
   const userDetails = JSON.parse(localStorage.getItem("userDetails"));
- 
-  const [newCountMessage, setNewCountMessage] = useState(() => JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() => JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-  const [currentCountMessage, setCurrentCountMessage] = useState(() => JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
 
- 
- 
+  const [newCountMessage, setNewCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+  );
+  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() =>
+    JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+  );
+  const [currentCountMessage, setCurrentCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+  );
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLastUserMessageCounts(JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-      setNewCountMessage(JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-      setCurrentCountMessage(JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+      setLastUserMessageCounts(
+        JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+      );
+      setNewCountMessage(
+        JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+      );
+      setCurrentCountMessage(
+        JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+      );
     }, 1000); // Update every second
 
     return () => clearInterval(intervalId); // Clean up on component unmount
@@ -71,26 +80,37 @@ function BillingTeamChat() {
 
   const handleClick = (id, name) => {
     // Get the current count message and last user message counts from local storage
-    console.log('name   ',name)
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    console.log("name   ", name);
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
     // Update lastUserMessageCounts with currentCountMessage for the clicked user
     const updatedLastUserMessageCounts = lastUserMessageCounts.map((user) => {
       if (user.userId === id) {
-        return { userId: user.userId, count: currentCountMessage.find((u) => u.userId === id)?.count || 0 };
+        return {
+          userId: user.userId,
+          count: currentCountMessage.find((u) => u.userId === id)?.count || 0,
+        };
       }
       return user;
     });
 
     // If the user is not in lastUserMessageCounts, add them
     if (!updatedLastUserMessageCounts.some((user) => user.userId === id)) {
-      const currentCount = currentCountMessage.find((u) => u.userId === id)?.count || 0;
+      const currentCount =
+        currentCountMessage.find((u) => u.userId === id)?.count || 0;
       updatedLastUserMessageCounts.push({ userId: id, count: currentCount });
     }
 
     // Store the updated lastUserMessageCounts in local storage
-    localStorage.setItem("lastUserMessageCounts", JSON.stringify(updatedLastUserMessageCounts));
+    localStorage.setItem(
+      "lastUserMessageCounts",
+      JSON.stringify(updatedLastUserMessageCounts)
+    );
 
     // Set the state and fetch messages
     setSender(loggedInUserId);
@@ -102,23 +122,29 @@ function BillingTeamChat() {
 
   // Function to get the count for a user
   const getCountForUser = (userId) => {
-    const newCountMessage = JSON.parse(localStorage.getItem("newCountMessage") || "[]");
+    const newCountMessage = JSON.parse(
+      localStorage.getItem("newCountMessage") || "[]"
+    );
     const user = newCountMessage.find((item) => item.userId === userId);
     return user ? user.count : 0;
   };
 
   // Function to get the unread count for a user
   const getUnreadCountForUser = (userId) => {
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
-    const currentCount = currentCountMessage.find((user) => user.userId === userId)?.count || 0;
-    const lastCount = lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
+    const currentCount =
+      currentCountMessage.find((user) => user.userId === userId)?.count || 0;
+    const lastCount =
+      lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
 
     return currentCount - lastCount;
   };
-
-
 
   const fetchMessages = (sender, recipient) => {
     axios
@@ -138,19 +164,21 @@ function BillingTeamChat() {
         const filteredUsers = response.data.filter(
           (user) => user._id != loggedInUserId
         );
-      
+
         setUsers(filteredUsers);
       })
       .catch((error) => {
         console.error(error);
       });
   }, [loggedInUserId]);
- 
+
   useEffect(() => {
-    const intervalId = setInterval(() => fetchMessages(sender, recipient), 2000);
+    const intervalId = setInterval(
+      () => fetchMessages(sender, recipient),
+      2000
+    );
     return () => clearInterval(intervalId);
   }, [sender, recipient]);
-
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() && !attachment) return;
@@ -168,14 +196,14 @@ function BillingTeamChat() {
     };
 
     try {
-      const resp = await axios.post(`${BASE_URL}/api/postmessages`, messageData)
+      const resp = await axios.post(
+        `${BASE_URL}/api/postmessages`,
+        messageData
+      );
       setMessages([...messages, resp.data.data]);
-
     } catch (error) {
       console.error(error);
-
     }
-
   };
 
   const handleFileUpload = (file) => {
@@ -197,7 +225,8 @@ function BillingTeamChat() {
             users.map(async (user) => {
               const response = await axios.get(
                 `${BASE_URL}/api/mark-messages-read/${user._id}
-              `);
+              `
+              );
               return { userId: user._id, data: response.data };
             })
           );
@@ -211,8 +240,6 @@ function BillingTeamChat() {
       // return () => clearInterval(intervalId);
     }
   }, [users]);
-
-
 
   const handleBackToEmployees = () => {
     setShowChat(false);
@@ -256,7 +283,6 @@ function BillingTeamChat() {
   };
 
   const handleForwardMessage = () => {
-
     setShowForwardModal(false);
     setShowDropdown(null);
   };
@@ -276,19 +302,16 @@ function BillingTeamChat() {
 
   const isActive = (path) => location.pathname === path;
   const handleAnnouncement = () => {
-    navigate(`/fetchAllAnnouncement/${'managerChat'}`);
+    navigate(`/fetchAllAnnouncement/${"managerChat"}`);
   };
-  
-
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await fetchAnnounce();
-        setAnnouncements(data); 
-  
+        setAnnouncements(data);
       } catch (error) {
-        console.error('Error fetching announcements:', error);
+        console.error("Error fetching announcements:", error);
       }
     };
 
@@ -304,49 +327,49 @@ function BillingTeamChat() {
   };
 
   const handleModalClose = () => {
-    setImageForEditing(''); // Close the modal and reset selected image
+    setImageForEditing(""); // Close the modal and reset selected image
     setShowImageEditor(false); // Close edit modal
   };
   const handleEditImage = (message) => {
     setShowImageEditor(true);
-    setImageForEditing(((message.content.image || message.content.camera)));
+    setImageForEditing(message.content.image || message.content.camera);
     // console.log("*******",imageForEditing)
   };
 
   const handleDelete = (message) => {
     axios
-     .delete(`${BASE_URL}/api/delmessages/${message._id}`)
-     .then((response) => {
-      
-        setMessages(messages.filter((m) => m._id!== message._id));
-        setShowDropdown("null")
+      .delete(`${BASE_URL}/api/delmessages/${message._id}`)
+      .then((response) => {
+        setMessages(messages.filter((m) => m._id !== message._id));
+        setShowDropdown("null");
       })
 
-     .catch((error) => {
+      .catch((error) => {
         console.error(error);
       });
   };
 
-   // Function to sort users based on unread message count
-   const sortedUsers = users
-   .filter((user) =>
+  // Function to sort users based on unread message count
+  const sortedUsers = users
+    .filter((user) =>
+      user?.name?.toLowerCase().includes(userSearchQuery?.toLowerCase())
+    )
+    .map((user) => ({
+      ...user,
+      unreadCount: getUnreadCountForUser(user._id),
+    }))
+    .sort((a, b) => b.unreadCount - a.unreadCount);
 
-     user?.name?.toLowerCase().includes(userSearchQuery?.toLowerCase())
-
-   )
-   .map((user) => ({
-     ...user,
-     unreadCount: getUnreadCountForUser(user._id),
-   }))
-   .sort((a, b) => b.unreadCount - a.unreadCount);
-
-   
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden ">
-      
-    {!showChat && <span className="mt-20"><ScrollingNavbar  /></span>}
-   <BillingSidebar/>
-   
+      <GPSTracker managerId={loggedInUserId} path={"te-location"} />
+      {!showChat && (
+        <span className="mt-20">
+          <ScrollingNavbar />
+        </span>
+      )}
+      <BillingSidebar />
+
       {showChat ? (
         <div className="w-full mb-20 lg:mb-0 flex flex-col justify-between overflow-hidden">
           <div className="flex items-center justify-between p-4 lg:bg-[#5443c3] lg:text-white text-[#5443c3] bg-white sticky top-0 z-10 border border-[#5443c3]">
@@ -357,7 +380,6 @@ function BillingTeamChat() {
               <FaArrowLeft />
             </button>
 
-
             <h1 className="lg:text-2xl text-xl font-bold">{recipientName}</h1>
           </div>
 
@@ -365,11 +387,11 @@ function BillingTeamChat() {
             {messages.map((message, index) => (
               <div
                 key={message._id}
-                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap lg:text-3xl md:text-xl text-sm font-bold ${message.sender === loggedInUserId
-                  ? "self-end bg-[#e1dff3] text-[#5443c3] border border-[#5443c3] rounded-tr-3xl rounded-bl-3xl"
-                  :  "self-start bg-[#ffffff] text-[#5443c3] border border-[#5443c3] rounded-tl-3xl rounded-br-3xl"
-                  }`}
-
+                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap lg:text-3xl md:text-xl text-sm font-bold ${
+                  message.sender === loggedInUserId
+                    ? "self-end bg-[#e1dff3] text-[#5443c3] border border-[#5443c3] rounded-tr-3xl rounded-bl-3xl"
+                    : "self-start bg-[#ffffff] text-[#5443c3] border border-[#5443c3] rounded-tl-3xl rounded-br-3xl"
+                }`}
                 onMouseEnter={() => handleHover(index)}
                 onMouseLeave={() => setHoveredMessage(null)}
               >
@@ -381,7 +403,9 @@ function BillingTeamChat() {
                   </div>
                 )}
                 {message.content && message.content.text && (
-                  <p className="font-bold lg:text-xl text-sm">{message.content.text}</p>
+                  <p className="font-bold lg:text-xl text-sm">
+                    {message.content.text}
+                  </p>
                 )}
                 {message.content && message.content.image && (
                   <img
@@ -395,13 +419,16 @@ function BillingTeamChat() {
                     href={message.content.document}
                     target="_blank"
                     rel="noopener noreferrer"
-                   className="text-orange-500 hover:underline lg:text-8xl md:text-6xl text-4xl"
+                    className="text-orange-500 hover:underline lg:text-8xl md:text-6xl text-4xl"
                   >
                     <IoIosDocument className="text-9xl" />
                   </a>
                 )}
                 {message.content && message.content.video && (
-                  <video controls className="max-w-xs lg:h-96 lg:w-72 md:h-96 md:w-64 h-40 w-32 text-4xl">
+                  <video
+                    controls
+                    className="max-w-xs lg:h-96 lg:w-72 md:h-96 md:w-64 h-40 w-32 text-4xl"
+                  >
                     <source src={message.content.video} type="video/mp4" />
                     Your browser does not support the video tag.
                   </video>
@@ -424,46 +451,49 @@ function BillingTeamChat() {
                   />
                 )}
 
-{showDropdown === index && (
-                    <div className="absolute top-8 right-2 bg-white border rounded shadow-lg z-10">
+                {showDropdown === index && (
+                  <div className="absolute top-8 right-2 bg-white border rounded shadow-lg z-10">
+                    <button
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => handleReply(message)}
+                    >
+                      Reply
+                    </button>
+                    <button
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => handleForward(message)}
+                    >
+                      Forward
+                    </button>
+                    {(message.content.image || message.content.camera) && (
                       <button
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => handleReply(message)}
+                        onClick={() => handleEditImage(message)}
                       >
-                        Reply
+                        Edit Image
                       </button>
+                    )}
+                    {message.sender === loggedInUserId && (
                       <button
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                        onClick={() => handleForward(message)}
+                        onClick={() => handleDelete(message)}
                       >
-                        Forward
+                        delete
                       </button>
-                      {((message.content.image || message.content.camera)) && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleEditImage(message)}
-                        >
-                          Edit Image
-                        </button>
-                      )}
-                      {
-                      message.sender === loggedInUserId && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleDelete(message)}
-                        >
-                          delete
-                        </button>
-                      )
-                    }
-                    </div>
-                  )}
+                    )}
+                  </div>
+                )}
               </div>
             ))}
             <div ref={messagesEndRef} />
             {showCamera && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
-                <Camera onCapture={handleCapture} onClose={handleCloseCamera} loggedInUserId={loggedInUserId} recipient={recipient} />
+                <Camera
+                  onCapture={handleCapture}
+                  onClose={handleCloseCamera}
+                  loggedInUserId={loggedInUserId}
+                  recipient={recipient}
+                />
               </div>
             )}
           </div>
@@ -483,7 +513,6 @@ function BillingTeamChat() {
             </button>
 
             <button
-
               onClick={handleSendMessage}
               className="bg-[#5443c3] hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             >
@@ -491,47 +520,44 @@ function BillingTeamChat() {
             </button>
             <AllUsersFileModel sender={loggedInUserId} recipient={recipient} />
           </div>
-          <ScrollToBottomButton messagesEndRef={messagesEndRef}/>
+          <ScrollToBottomButton messagesEndRef={messagesEndRef} />
         </div>
       ) : (
         <div className="w-full lg:w-1/4 bg-white p-4 overflow-y-auto sticky lg:mt-20 border border-purple-100 top-0  z-10">
-            <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">All Manager Team</h1>
-            <div>
-              
-              {/* <div
+          <h1 className="lg:text-2xl text-xl font-bold mb-4 text-[#5443c3] lg:m-4">
+            All Manager Team
+          </h1>
+          <div>
+            {/* <div
                 onClick={handleAnnouncement}
                 className={`group relative flex items-center rounded-full p-3 md:p-5 ${isActive("/fetchAllAnnouncement") ? "bg-blue-500 text-white" : "bg-[#fffefd]"}`}
               >
                 <IoMdNotificationsOutline className="text-lg md:text-2xl lg:text-3xl" />
               </div> */}
 
-              {/* {announcements.length > 0 && (
+            {/* {announcements.length > 0 && (
                 <span className="relative -top-11 -right-5 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center">
                   {announcements?.length}
                 </span>
               )} */}
 
-              <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 ml-1 whitespace-nowrap z-50 bg-black text-white text-xs md:text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                Announcement
-              </span>
+            <span className="absolute bottom-0 left-1/2 transform -translate-x-1/2 ml-1 whitespace-nowrap z-50 bg-black text-white text-xs md:text-sm rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              Announcement
+            </span>
+          </div>
 
-
-            </div>
-
-            <div
-              onClick={handleLogout}
-              className=" flex items-center bg-yellow-200 hover:bg-yellow-500 rounded-full h-auto "
-            >
-              {/* <div className="relative flex items-center justify-center">
+          <div
+            onClick={handleLogout}
+            className=" flex items-center bg-yellow-200 hover:bg-yellow-500 rounded-full h-auto "
+          >
+            {/* <div className="relative flex items-center justify-center">
                 <span className="absolute bottom-full mb-2 whitespace-nowrap bg-black text-white text-xs md:text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   Logout
                 </span>
                 <BiLogOut className="mx-10 my-2 text-lg md:text-2xl lg:text-3xl" />
               </div> */}
+          </div>
 
-
-            </div>
-       
           <div className=" relative flex items-center mb-5 ">
             <input
               type="text"
@@ -542,16 +568,18 @@ function BillingTeamChat() {
             />
             <AiOutlineSearch className="absolute top-3 left-3 text-gray-500 text-2xl" />
           </div>
-          
 
           <ul>
             {sortedUsers.map((user) => (
               <li
                 key={user._id}
-                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${unreadUsers.some((unreadUser) => unreadUser.userId === user._id)
-                  ? "bg-blue-200"
-                  : "bg-gray-200"
-                  } ${recipient === user._id ? "bg-green-200" : ""}`}
+                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${
+                  unreadUsers.some(
+                    (unreadUser) => unreadUser.userId === user._id
+                  )
+                    ? "bg-blue-200"
+                    : "bg-gray-200"
+                } ${recipient === user._id ? "bg-green-200" : ""}`}
                 onClick={() => handleClick(user._id, user.manager_name)}
               >
                 <span>{user.manager_name}</span>
@@ -568,7 +596,6 @@ function BillingTeamChat() {
         </div>
       )}
 
-
       {showForwardModal && (
         <ForwardMessageModalBillingTeam
           users={users}
@@ -584,7 +611,6 @@ function BillingTeamChat() {
           recipient={recipient}
           isVisible={showReplyModal}
           onClose={() => setShowReplyModal(false)}
-
         />
       )}
       {showImageEditor && (
@@ -592,13 +618,10 @@ function BillingTeamChat() {
           imageUrl={imageForEditing}
           handleModalClose={handleModalClose}
           recipient={recipient}
-         
         />
       )}
-
     </div>
   );
 }
-
 
 export default BillingTeamChat;

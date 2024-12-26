@@ -15,7 +15,7 @@ import EditModel from "../utility/EditModel";
 import ScrollToBottomButton from "../utility/ScrollToBottomButton";
 import { FaVideo } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
-
+import GPSTracker from "../manager/Gps";
 
 function ChatPage() {
   const [messages, setMessages] = useState([]);
@@ -39,21 +39,34 @@ function ChatPage() {
   const [showReplyModal, setShowReplyModal] = useState(false);
   const [showCamera, setShowCamera] = useState(false);
   const [showImageEditor, setShowImageEditor] = useState(false);
-  const [imageForEditing, setImageForEditing] = useState('');
-  const [userDetails, setUserDetails] = useState(() => JSON.parse(localStorage.getItem("userDetails")));
+  const [imageForEditing, setImageForEditing] = useState("");
+  const [userDetails, setUserDetails] = useState(() =>
+    JSON.parse(localStorage.getItem("userDetails"))
+  );
 
-  const [newCountMessage, setNewCountMessage] = useState(() => JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() => JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-  const [currentCountMessage, setCurrentCountMessage] = useState(() => JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+  const [newCountMessage, setNewCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+  );
+  const [lastUserMessageCounts, setLastUserMessageCounts] = useState(() =>
+    JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+  );
+  const [currentCountMessage, setCurrentCountMessage] = useState(() =>
+    JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+  );
 
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setLastUserMessageCounts(JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]"));
-      setNewCountMessage(JSON.parse(localStorage.getItem("newCountMessage") || "[]"));
-      setCurrentCountMessage(JSON.parse(localStorage.getItem("currentCountMessage") || "[]"));
+      setLastUserMessageCounts(
+        JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]")
+      );
+      setNewCountMessage(
+        JSON.parse(localStorage.getItem("newCountMessage") || "[]")
+      );
+      setCurrentCountMessage(
+        JSON.parse(localStorage.getItem("currentCountMessage") || "[]")
+      );
     }, 1000); // Update every second
 
     return () => clearInterval(intervalId); // Clean up on component unmount
@@ -61,25 +74,36 @@ function ChatPage() {
 
   const handleClick = (id, name) => {
     // Get the current count message and last user message counts from local storage
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
     // Update lastUserMessageCounts with currentCountMessage for the clicked user
     const updatedLastUserMessageCounts = lastUserMessageCounts.map((user) => {
       if (user.userId === id) {
-        return { userId: user.userId, count: currentCountMessage.find((u) => u.userId === id)?.count || 0 };
+        return {
+          userId: user.userId,
+          count: currentCountMessage.find((u) => u.userId === id)?.count || 0,
+        };
       }
       return user;
     });
 
     // If the user is not in lastUserMessageCounts, add them
     if (!updatedLastUserMessageCounts.some((user) => user.userId === id)) {
-      const currentCount = currentCountMessage.find((u) => u.userId === id)?.count || 0;
+      const currentCount =
+        currentCountMessage.find((u) => u.userId === id)?.count || 0;
       updatedLastUserMessageCounts.push({ userId: id, count: currentCount });
     }
 
     // Store the updated lastUserMessageCounts in local storage
-    localStorage.setItem("lastUserMessageCounts", JSON.stringify(updatedLastUserMessageCounts));
+    localStorage.setItem(
+      "lastUserMessageCounts",
+      JSON.stringify(updatedLastUserMessageCounts)
+    );
 
     // Set the state and fetch messages
     setSender(loggedInUserId);
@@ -91,18 +115,26 @@ function ChatPage() {
 
   // Function to get the count for a user
   const getCountForUser = (userId) => {
-    const newCountMessage = JSON.parse(localStorage.getItem("newCountMessage") || "[]");
+    const newCountMessage = JSON.parse(
+      localStorage.getItem("newCountMessage") || "[]"
+    );
     const user = newCountMessage.find((item) => item.userId === userId);
     return user ? user.count : 0;
   };
 
   // Function to get the unread count for a user
   const getUnreadCountForUser = (userId) => {
-    const currentCountMessage = JSON.parse(localStorage.getItem("currentCountMessage") || "[]");
-    const lastUserMessageCounts = JSON.parse(localStorage.getItem("lastUserMessageCounts") || "[]");
+    const currentCountMessage = JSON.parse(
+      localStorage.getItem("currentCountMessage") || "[]"
+    );
+    const lastUserMessageCounts = JSON.parse(
+      localStorage.getItem("lastUserMessageCounts") || "[]"
+    );
 
-    const currentCount = currentCountMessage.find((user) => user.userId === userId)?.count || 0;
-    const lastCount = lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
+    const currentCount =
+      currentCountMessage.find((user) => user.userId === userId)?.count || 0;
+    const lastCount =
+      lastUserMessageCounts.find((user) => user.userId === userId)?.count || 0;
 
     return currentCount - lastCount;
   };
@@ -117,9 +149,6 @@ function ChatPage() {
       unreadCount: getUnreadCountForUser(user._id),
     }))
     .sort((a, b) => b.unreadCount - a.unreadCount);
-
-
-    
 
   const fetchMessages = (sender, recipient) => {
     axios
@@ -139,7 +168,7 @@ function ChatPage() {
         const filteredUsers = response.data.filter(
           (user) => user._id !== loggedInUserId
         );
-        console.log("filteredUsers...", filteredUsers)
+        console.log("filteredUsers...", filteredUsers);
         setUsers(filteredUsers);
       })
       .catch((error) => {
@@ -148,7 +177,10 @@ function ChatPage() {
   }, [loggedInUserId]);
 
   useEffect(() => {
-    const intervalId = setInterval(() => fetchMessages(sender, recipient), 2000);
+    const intervalId = setInterval(
+      () => fetchMessages(sender, recipient),
+      2000
+    );
     return () => clearInterval(intervalId);
   }, [sender, recipient]);
 
@@ -168,7 +200,10 @@ function ChatPage() {
     };
 
     try {
-      const response = await axios.post(`${BASE_URL}/api/postmessages`, messageData);
+      const response = await axios.post(
+        `${BASE_URL}/api/postmessages`,
+        messageData
+      );
       setMessages([...messages, response.data.data]);
       setNewMessage("");
       setAttachment(null);
@@ -228,7 +263,6 @@ function ChatPage() {
     fetchUsers();
   }, [loggedInUserId, messages, getUnreadCountForUser]);
 
-
   const handleBackToEmployees = () => {
     setShowChat(false);
     setRecipient("");
@@ -243,9 +277,6 @@ function ChatPage() {
     handleResize(); // Initial check
     return () => window.removeEventListener("resize", handleResize);
   }, []);
-
-
-
 
   const handleHover = (index) => {
     setHoveredMessage(index);
@@ -284,12 +315,12 @@ function ChatPage() {
     setShowCamera(false);
   };
   const handleModalClose = () => {
-    setImageForEditing(''); // Close the modal and reset selected image
+    setImageForEditing(""); // Close the modal and reset selected image
     setShowImageEditor(false); // Close edit modal
   };
   const handleEditImage = (message) => {
     setShowImageEditor(true);
-    setImageForEditing(((message.content.image || message.content.camera)));
+    setImageForEditing(message.content.image || message.content.camera);
     // console.log("*******",imageForEditing)
   };
 
@@ -297,9 +328,8 @@ function ChatPage() {
     axios
       .delete(`${BASE_URL}/api/delmessages/${message._id}`)
       .then((response) => {
-
         setMessages(messages.filter((m) => m._id !== message._id));
-        setShowDropdown("null")
+        setShowDropdown("null");
       })
 
       .catch((error) => {
@@ -308,12 +338,12 @@ function ChatPage() {
   };
 
   const handleVideoCall = () => {
-    navigate(`/videoCall/${recipient}`)
-  }
-
+    navigate(`/videoCall/${recipient}`);
+  };
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden">
+      <GPSTracker managerId={loggedInUserId} path={"te-location"} />
       {!showChat && <ScrollingNavbar />}
       <EmployeeSidebar />
 
@@ -340,10 +370,11 @@ function ChatPage() {
             {messages.map((message, index) => (
               <div
                 key={message._id}
-                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap lg:text-3xl md:text-xl text-sm font-bold ${message.sender === loggedInUserId
-                  ? "bg-[#e1dff3] text-[#5443c3] border border-[#5443c3] rounded-tr-3xl rounded-bl-3xl self-end"
-                  : "bg-white text-[#5443c3] border border-[#5443c3] rounded-tl-3xl rounded-br-3xl self-start"
-                  }`}
+                className={`mb-4 p-4 rounded-lg max-w-[50%] relative break-words whitespace-pre-wrap lg:text-3xl md:text-xl text-sm font-bold ${
+                  message.sender === loggedInUserId
+                    ? "bg-[#e1dff3] text-[#5443c3] border border-[#5443c3] rounded-tr-3xl rounded-bl-3xl self-end"
+                    : "bg-white text-[#5443c3] border border-[#5443c3] rounded-tl-3xl rounded-br-3xl self-start"
+                }`}
                 onMouseEnter={() => handleHover(index)}
                 onMouseLeave={() => setHoveredMessage(null)}
               >
@@ -417,7 +448,7 @@ function ChatPage() {
                     >
                       Forward
                     </button>
-                    {((message.content.image || message.content.camera)) && (
+                    {(message.content.image || message.content.camera) && (
                       <button
                         className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         onClick={() => handleEditImage(message)}
@@ -425,16 +456,14 @@ function ChatPage() {
                         Edit Image
                       </button>
                     )}
-                    {
-                      message.sender === loggedInUserId && (
-                        <button
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                          onClick={() => handleDelete(message)}
-                        >
-                          delete
-                        </button>
-                      )
-                    }
+                    {message.sender === loggedInUserId && (
+                      <button
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => handleDelete(message)}
+                      >
+                        delete
+                      </button>
+                    )}
                   </div>
                 )}
               </div>
@@ -451,10 +480,7 @@ function ChatPage() {
               </div>
             )}
             <ScrollToBottomButton messagesEndRef={messagesEndRef} />
-
-
           </div>
-
 
           <div className="flex items-center p-4 bg-[#eef2fa] border-t border-gray-200 fixed bottom-0 w-full lg:static ">
             <input
@@ -464,7 +490,10 @@ function ChatPage() {
               placeholder="Type a message..."
               className="flex-grow p-2 border rounded-lg mr-2 border-[#5443c3]"
             />
-            <button onClick={() => setShowCamera(true)} className="mr-2 text-xl">
+            <button
+              onClick={() => setShowCamera(true)}
+              className="mr-2 text-xl"
+            >
               <FaCamera />
             </button>
             <button
@@ -480,7 +509,6 @@ function ChatPage() {
               senderName={userDetails.name}
             />
           </div>
-
         </div>
       ) : (
         <div className="w-full lg:w-1/4 bg-white p-4 overflow-y-auto sticky mt-10 ">
@@ -503,10 +531,13 @@ function ChatPage() {
             {sortedUsers.map((user) => (
               <li
                 key={user._id}
-                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${unreadUsers.some((unreadUser) => unreadUser.userId === user._id)
-                  ? "bg-blue-200"
-                  : "bg-gray-200"
-                  } ${recipient === user._id ? "bg-green-200" : ""}`}
+                className={`p-4 mb-2 rounded-lg cursor-pointer flex justify-between text-[#5443c3] text-sm font-medium ${
+                  unreadUsers.some(
+                    (unreadUser) => unreadUser.userId === user._id
+                  )
+                    ? "bg-blue-200"
+                    : "bg-gray-200"
+                } ${recipient === user._id ? "bg-green-200" : ""}`}
                 onClick={() => handleClick(user._id, user.name)}
               >
                 <span>{user.name}</span>
@@ -520,10 +551,7 @@ function ChatPage() {
               </li>
             ))}
           </ul>
-
-
         </div>
-
       )}
 
       {showForwardModal && (
@@ -548,7 +576,7 @@ function ChatPage() {
           imageUrl={imageForEditing}
           handleModalClose={handleModalClose}
           recipient={recipient}
-        //admin='admin'
+          //admin='admin'
         />
       )}
     </div>
@@ -556,4 +584,3 @@ function ChatPage() {
 }
 
 export default ChatPage;
-
