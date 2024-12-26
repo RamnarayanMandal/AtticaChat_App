@@ -6,7 +6,9 @@ import back13 from "../../assests/back13.png";
 import { BASE_URL } from "../../constants";
 import SuperAdminSidebar from "../SuperAdmin/SuperAdminSidebar";
 import TETable from "./TETable";
+import AdminLocation from "./AdminLocation";
 import EmployeeLoction from "./EmployeeLoction";
+import BillingTeamLocaton from "./BillingTeamLocaton";
 
 const AtticDashboard = () => {
   const [manager, setManager] = useState([]);
@@ -45,12 +47,31 @@ const AtticDashboard = () => {
         console.error("Error fetching employees:", error);
       }
     };
-    
+
     fetchEmployees();
   }, []);
 
   const uniqueBranches = new Set(manager.map((item) => item.branch_name));
   const totalBranches = uniqueBranches.size;
+
+  // Options that require TETable rendering
+  const teTableOptions = [
+    "Admin",
+    "Employee",
+    "TE",
+    "Accountant",
+    "Software",
+    "HR",
+    "CallCenter",
+    "VirtualTeam",
+    "MonitoringTeam",
+    "Bouncers/Driver",
+    "Security/CCTV",
+    "DigitalMarketing",
+    "Logistic",
+    "Cashier",
+    "BillingTeam"
+  ];
 
   return (
     <div className="lg:flex block bg-cover bg-center min-h-screen relative bg-[#e8effe]">
@@ -62,7 +83,12 @@ const AtticDashboard = () => {
 
         {/* Dropdown menu for selecting view */}
         <div className="mb-4">
-          <label htmlFor="viewOption" className="mr-2 font-semibold">View:</label>
+          <label
+            htmlFor="viewOption"
+            className="mr-2 font-semibold text-xl font-serif font-semibold"
+          >
+            Select User:
+          </label>
           <select
             id="viewOption"
             className="p-2 border border-gray-300 rounded"
@@ -70,27 +96,39 @@ const AtticDashboard = () => {
             onChange={(e) => setViewOption(e.target.value)}
           >
             <option value="manager">Manager</option>
-            <option value="TE">TE</option>
-            <option value="Employee">Employee</option>
+            {teTableOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
           </select>
         </div>
 
         {/* Display different content based on selected view */}
         {viewOption === "manager" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <div className="p-4 rounded-lg shadow-lg bg-cover" style={{ backgroundImage: `url(${back15})` }}>
+            <div
+              className="p-4 rounded-lg shadow-lg bg-cover"
+              style={{ backgroundImage: `url(${back15})` }}
+            >
               <div className="lg:text-xl text-lg font-bold text-white">
                 No of Registered Employees
               </div>
               <div className="text-2xl text-white">{employee.length}</div>
             </div>
-            <div className="p-4 rounded-lg shadow-lg  bg-cover" style={{ backgroundImage: `url(${back19})` }}>
+            <div
+              className="p-4 rounded-lg shadow-lg bg-cover"
+              style={{ backgroundImage: `url(${back19})` }}
+            >
               <div className="lg:text-xl text-lg font-bold text-white">
                 No of Registered Branch Managers
               </div>
               <div className="text-2xl text-white">{manager.length}</div>
             </div>
-            <div className="p-4 rounded-lg shadow-lg  bg-cover" style={{ backgroundImage: `url(${back13})` }}>
+            <div
+              className="p-4 rounded-lg shadow-lg bg-cover"
+              style={{ backgroundImage: `url(${back13})` }}
+            >
               <div className="lg:text-xl text-lg font-bold text-white">
                 No of Branches
               </div>
@@ -99,19 +137,20 @@ const AtticDashboard = () => {
           </div>
         )}
 
-        {viewOption === "TE" && (
-          <div>
-            {/* Replace with TE specific content or component */}
-            <p>TE Details</p>
-          </div>
-        )}
+        {viewOption !== "manager" &&
+          viewOption !== "Admin" &&
+          viewOption !== "Employee" &&
+          viewOption !== "BillingTeam"  && <TETable name={viewOption} 
+          />}
 
-        {/* Table or component based on selected view */}
-        <div className="w-full">
-          {viewOption === "manager" && <TableSuper />}
-          {viewOption === "TE" && <TETable />}
-          {viewOption === "Employee" && <EmployeeLoction />}
-        </div>
+        {/* TableSuper component only for managers */}
+        {viewOption === "manager" && <TableSuper />}
+
+        {/* AdminLocation component to display geolocation data */}
+        {viewOption === "Admin" && <AdminLocation />}
+        {viewOption === "Employee" && <EmployeeLoction />}
+        {viewOption === "BillingTeam" && <BillingTeamLocaton/>}
+
       </div>
     </div>
   );
