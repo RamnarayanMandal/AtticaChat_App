@@ -6,6 +6,7 @@ import back13 from "../../assests/back13.png";
 import { BASE_URL } from "../../constants";
 import SuperAdminSidebar from "../SuperAdmin/SuperAdminSidebar";
 import TETable from "./TETable";
+import EmployeeLoction from "./EmployeeLoction";
 
 const AtticDashboard = () => {
   const [manager, setManager] = useState([]);
@@ -70,6 +71,7 @@ const AtticDashboard = () => {
           >
             <option value="manager">Manager</option>
             <option value="TE">TE</option>
+            <option value="Employee">Employee</option>
           </select>
         </div>
 
@@ -108,6 +110,7 @@ const AtticDashboard = () => {
         <div className="w-full">
           {viewOption === "manager" && <TableSuper />}
           {viewOption === "TE" && <TETable />}
+          {viewOption === "Employee" && <EmployeeLoction />}
         </div>
       </div>
     </div>
