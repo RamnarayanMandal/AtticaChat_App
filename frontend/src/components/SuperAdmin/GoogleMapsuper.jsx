@@ -1,11 +1,17 @@
-import React from 'react';
-import { MapContainer, TileLayer, Marker, Polyline, useMap } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
+import React from "react";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Polyline,
+  useMap,
+} from "react-leaflet";
+import "leaflet/dist/leaflet.css";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 
 const CloseButton = ({ onClose }) => {
   const map = useMap();
-  
+
   return (
     <div className="leaflet-top leaflet-right">
       <div className="leaflet-control">
@@ -19,9 +25,12 @@ const CloseButton = ({ onClose }) => {
 };
 
 const GoogleMapsuper = ({ locations, onClose }) => {
-  console.log("GoogleMapsuper",locations);
+  console.log("GoogleMapsuper", locations);
   const position = [locations[0].latitude, locations[0].longitude]; // Use the first location as the starting point
-  const polyline = locations.map(location => [location.latitude, location.longitude]); // Map locations to polyline coordinates
+  const polyline = locations.map((location) => [
+    location.latitude,
+    location.longitude,
+  ]); // Map locations to polyline coordinates
 
   return (
     <div className="relative h-screen w-full border-2 border-[#5443c3]">

@@ -6,6 +6,7 @@ import back13 from "../../assests/back13.png";
 import { BASE_URL } from "../../constants";
 import SuperAdminSidebar from "../SuperAdmin/SuperAdminSidebar";
 import TETable from "./TETable";
+import AdminLocation from "./AdminLocation";
 
 const AtticDashboard = () => {
   const [manager, setManager] = useState([]);
@@ -44,7 +45,7 @@ const AtticDashboard = () => {
         console.error("Error fetching employees:", error);
       }
     };
-    
+
     fetchEmployees();
   }, []);
 
@@ -61,7 +62,9 @@ const AtticDashboard = () => {
 
         {/* Dropdown menu for selecting view */}
         <div className="mb-4">
-          <label htmlFor="viewOption" className="mr-2 font-semibold">View:</label>
+          <label htmlFor="viewOption" className="mr-2 font-semibold">
+            View:
+          </label>
           <select
             id="viewOption"
             className="p-2 border border-gray-300 rounded"
@@ -70,25 +73,35 @@ const AtticDashboard = () => {
           >
             <option value="manager">Manager</option>
             <option value="TE">TE</option>
+            <option value="admin">Admin</option>
           </select>
         </div>
 
         {/* Display different content based on selected view */}
         {viewOption === "manager" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            <div className="p-4 rounded-lg shadow-lg bg-cover" style={{ backgroundImage: `url(${back15})` }}>
+            <div
+              className="p-4 rounded-lg shadow-lg bg-cover"
+              style={{ backgroundImage: `url(${back15})` }}
+            >
               <div className="lg:text-xl text-lg font-bold text-white">
                 No of Registered Employees
               </div>
               <div className="text-2xl text-white">{employee.length}</div>
             </div>
-            <div className="p-4 rounded-lg shadow-lg  bg-cover" style={{ backgroundImage: `url(${back19})` }}>
+            <div
+              className="p-4 rounded-lg shadow-lg  bg-cover"
+              style={{ backgroundImage: `url(${back19})` }}
+            >
               <div className="lg:text-xl text-lg font-bold text-white">
                 No of Registered Branch Managers
               </div>
               <div className="text-2xl text-white">{manager.length}</div>
             </div>
-            <div className="p-4 rounded-lg shadow-lg  bg-cover" style={{ backgroundImage: `url(${back13})` }}>
+            <div
+              className="p-4 rounded-lg shadow-lg  bg-cover"
+              style={{ backgroundImage: `url(${back13})` }}
+            >
               <div className="lg:text-xl text-lg font-bold text-white">
                 No of Branches
               </div>
@@ -108,6 +121,7 @@ const AtticDashboard = () => {
         <div className="w-full">
           {viewOption === "manager" && <TableSuper />}
           {viewOption === "TE" && <TETable />}
+          {viewOption === "admin" && <AdminLocation />}
         </div>
       </div>
     </div>
