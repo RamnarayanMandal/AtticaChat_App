@@ -331,40 +331,6 @@ const Sidebar = () => {
         </div>
 
         <div
-<<<<<<< HEAD
-=======
-          onMouseEnter={() => setShowEmployeeOptions(true)}
-          onMouseLeave={() => setShowEmployeeOptions(false)}
-          className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 cursor-pointer z-50 ${
-            getRegistrationOptions()?.some(
-              (option) => option.route === activeRoute
-            )
-              ? "bg-blue-500 text-white"
-              : "bg-[#fffefd]"
-          }`}
-        >
-          <PersonAddIcon className="text-lg md:text-2xl lg:text-3xl" />
-          <span
-            className={`absolute lg:bottom-auto lg:w-96 lg:left-full top-12 -right-20 lg:ml-0 lg:mt-2 whitespace-nowrap bg-[#f6f5fb] text-[#5443c3] border border-[#5443c3] text-xs lg:text-lg md:text-sm rounded py-6 px-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
-              userDetails?.department === "Admin" ? "lg:-top-60" : "lg:top-0"
-            }`}
-            style={{ display: showEmployeeOptions ? "block" : "none" }}
-          >
-            {getRegistrationOptions()?.map((option, index) => (
-              <div
-                key={index}
-                onClick={() => handleNavigation(option.route)}
-                className="flex items-center gap-2 cursor-pointer hover:text-red-500 lg:hover:text-2xl hover:text-sm"
-              >
-                <option.icon className="bg-white rounded-full mr-2 my-2 text-2xl" />
-                <span className="my-2">{option.label}</span>
-              </div>
-            ))}
-          </span>
-        </div>
-
-        <div
->>>>>>> b49c9db3146ce1b4c688e8251894549087e524f6
           onClick={() => handleNavigation("/adminToemp")}
           className={`group relative flex items-center lg:rounded-full rounded-lg p-2 md:p-4 lg:p-5 z-50 cursor-pointer ${
             activeRoute === "/ChatPage"
@@ -377,7 +343,6 @@ const Sidebar = () => {
             Chat Page
           </span>
         </div>
-<<<<<<< HEAD
       </div>
 
       <div className="relative">
@@ -429,8 +394,6 @@ const Sidebar = () => {
             </div>
           </div>
         )}
-=======
->>>>>>> b49c9db3146ce1b4c688e8251894549087e524f6
       </div>
 
       <div
