@@ -1,6 +1,6 @@
 const BillingTeamUser = require("../model/BillingTeamUser");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const bcrypt = require("bcryptjs");
 const mongoose = require("mongoose");
 
 const billingTeamRegistration = async (req, res, next) => {
@@ -14,10 +14,8 @@ const billingTeamRegistration = async (req, res, next) => {
     branch_state,
     branch_city,
     branch_pincode,
-    group
+    group,
   } = req.body;
-
-
 
   // Check for missing fields
   if (
@@ -52,7 +50,7 @@ const billingTeamRegistration = async (req, res, next) => {
       branch_state,
       branch_city,
       branch_pincode,
-      group
+      group,
     });
 
     // Save the new user to the database
@@ -295,7 +293,7 @@ const getUserGroup = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: "User not found" });
     }
-    res.status(200).json(user.group );
+    res.status(200).json(user.group);
   } catch (error) {
     res.status(500).json({
       message: "An error occurred while fetching user group",
@@ -316,5 +314,5 @@ module.exports = {
   accessBlock,
   blockAllUser,
   deleteAllBillingTeam,
-  getUserGroup
+  getUserGroup,
 };

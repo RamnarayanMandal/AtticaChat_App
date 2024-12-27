@@ -157,19 +157,28 @@ function BillingTeamChat() {
       });
   };
 
-  useEffect(() => {
-    axios
-      .get(`${BASE_URL}/api/manager/getAllManagers`)
-      .then((response) => {
-        const filteredUsers = response.data.filter(
-          (user) => user._id != loggedInUserId
-        );
+  const fetchUserDetails = async () => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/api/manager/getAllManagers`
+      );
+      console.log("Response Data:", response.data); // Log response data for debugging
 
-        setUsers(filteredUsers);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      const filteredUsers = response.data.filter(
+        (user) => user._id !== loggedInUserId // Use !== for strict inequality
+      );
+      setUsers(filteredUsers);
+    } catch (error) {
+      console.error("Error fetching user details:", error); // Log error for debugging
+    }
+  };
+
+  console.log("User Details", users);
+
+  useEffect(() => {
+    if (loggedInUserId) {
+      fetchUserDetails();
+    }
   }, [loggedInUserId]);
 
   useEffect(() => {
@@ -349,16 +358,14 @@ function BillingTeamChat() {
       });
   };
 
-  // Function to sort users based on unread message count
   const sortedUsers = users
-    .filter((user) =>
-      user?.name?.toLowerCase().includes(userSearchQuery?.toLowerCase())
-    )
-    .map((user) => ({
+    ?.map((user) => ({
       ...user,
-      unreadCount: getUnreadCountForUser(user._id),
+      unreadCount: getUnreadCountForUser(user._id) || 0, // Default to 0 if undefined
     }))
     .sort((a, b) => b.unreadCount - a.unreadCount);
+
+  console.log("sortedUsers", sortedUsers);
 
   return (
     <div className="flex flex-col lg:flex-row h-screen overflow-hidden ">
