@@ -33,20 +33,7 @@ const BillingRegistrationModal = () => {
     });
   };
 
-  const handleGroupChange = (index, e) => {
-    const newGroup = [...group];
-    newGroup[index][e.target.name] = e.target.value;
-    setGroup(newGroup);
-  };
-
-  const handleAddGroup = () => {
-    setGroup([...group, { name: "", grade: "" }]);
-  };
-
-  const handleRemoveGroup = (index) => {
-    const newGroup = group.filter((_, i) => i !== index);
-    setGroup(newGroup);
-  };
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -77,32 +64,7 @@ const BillingRegistrationModal = () => {
     }
   };
 
-  const handleDelete = async () => {
-    try {
-      const result = await Swal.fire({
-        title: 'Are you sure?',
-        text: 'Do you want to delete users with the Logistic role?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonText: 'Yes, delete it!',
-        cancelButtonText: 'No, cancel!',
-      });
   
-      if (result.isConfirmed) {
-        const response = await axios.delete(`${BASE_URL}/api/billingTeam/deleteAllBillingTeam`);
-  
-        if (response) {
-          Swal.fire('Deleted!', 'Users have been deleted.', 'success');
-          window.location.reload();
-        } else {
-          const errorData = response.data;
-          Swal.fire('Failed!', errorData.message || 'Deletion failed', 'error');
-        }
-      }
-    } catch (error) {
-      Swal.fire('Error!', 'An error occurred: ' + error.message, 'error');
-    }
-  };
 
   return (
     <div className="lg:flex block bg-[#f6f5fb]">
@@ -157,53 +119,8 @@ const BillingRegistrationModal = () => {
                     />
                   </div>
                 ))}
-                <h3 className="text-[#5443c3] text-lg font-bold mt-4">Group Information</h3>
-                {group.map((item, index) => (
-                  <div key={index} className="mb-4">
-                    <div className="flex mb-2">
-                      <div className="w-1/2 pr-2">
-                        <label className="block text-[#5443c3] text-sm font-bold mb-2" htmlFor={`group-name-${index}`}>
-                          Group Name
-                        </label>
-                        <input
-                          id={`group-name-${index}`}
-                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                          type="text"
-                          name="name"
-                          value={item.name}
-                          onChange={(e) => handleGroupChange(index, e)}
-                        />
-                      </div>
-                      <div className="w-1/2 pl-2">
-                        <label className="block text-[#5443c3] text-sm font-bold mb-2" htmlFor={`group-grade-${index}`}>
-                          Group Grade
-                        </label>
-                        <input
-                          id={`group-grade-${index}`}
-                          className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                          type="text"
-                          name="grade"
-                          value={item.grade}
-                          onChange={(e) => handleGroupChange(index, e)}
-                        />
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveGroup(index)}
-                      className="text-red-500 hover:text-red-700 text-sm"
-                    >
-                      Remove Group
-                    </button>
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={handleAddGroup}
-                  className="bg-[#5443c3] hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline text-sm"
-                >
-                  Add Another Group
-                </button>
+  
+               
                 <div className="flex items-center justify-between mt-4">
                   <button
                     className="bg-[#5443c3] hover:bg-blue-700 text-white font-bold lg:py-2 lg:px-4 rounded focus:outline-none focus:shadow-outline text-sm py-2 px-2"

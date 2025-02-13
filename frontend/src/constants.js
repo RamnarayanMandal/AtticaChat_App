@@ -1,9 +1,9 @@
-export const BASE_URL = "https://api.atticachatbox.com";
+// export const BASE_URL = "https://api.atticachatbox.com";
 // export const BASE_URL = "https://atticachat-app.onrender.com";
-// export const BASE_URL = "http://localhost:5003";
+export const BASE_URL = "http://localhost:5003";
 
-export const APP_ID = 953843268;
-export const SERVER_SECRET = "7cc841c871a322c50479c4b59aac127f";
+export const APP_ID = 1998388743;
+export const SERVER_SECRET = "1fe004a13da251062b1a8803b9bbef34";
 
 export const emplyeRegistration = `${BASE_URL}/api/employeeRegistration/register`;
 

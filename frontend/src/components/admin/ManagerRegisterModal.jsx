@@ -175,45 +175,7 @@ const ManagerRegisterModal = () => {
                     ))}
                   </div>
                 </div>
-                <div className="mb-4">
-                  <label className="block text-[#5443c3] text-sm font-bold mb-2">Group and Grade</label>
-                  {formData.group.map((group, index) => (
-                    <div key={index} className="flex space-x-4 mb-4">
-                      <input
-                        type="text"
-                        name={`name-${index}`}
-                        value={group.name}
-                        onChange={handleChange}
-                        placeholder="Group Name"
-                        className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      />
-                      <input
-                        type="text"
-                        name={`grade-${index}`}
-                        value={group.grade}
-                        onChange={handleChange}
-                        placeholder="Group Grade"
-                        className="shadow appearance-none border rounded w-1/2 py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                      />
-                      {index > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveGroup(index)}
-                          className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
-                          Remove
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={handleAddGroup}
-                    className="bg-[#5443c3] hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  >
-                    Add Group
-                  </button>
-                </div>
+                
                 <div className="flex items-center justify-between">
                   <button
                     type="submit"
@@ -228,13 +190,7 @@ const ManagerRegisterModal = () => {
                   >
                     Cancel
                   </button>
-                  <button
-                    type="button"
-                    onClick={handleDelete}
-                    className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                  >
-                    Delete Logistic Users
-                  </button>
+                  
                 </div>
               </form>
             </div>

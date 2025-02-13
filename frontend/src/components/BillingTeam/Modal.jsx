@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const Modal = ({ show, onClose, employee, onUpdate }) => {
+const  Modal = ({ show, onClose, employee, onUpdate }) => {
   const [formData, setFormData] = useState({ ...employee });
 
   useEffect(() => {
